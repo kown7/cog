@@ -14,11 +14,22 @@ class FileHandler(object):
         self.lib = lib
         self.filePath = path + '/' + filename
 
-        # This is now very VHDL nomeclatura
         self.objectName = None
         self.objectType = FileType.Undefined
         self.st_mtime = None
         self.compileTime = None
+        self.dependsOnObject = []
+
+        self._setChangeTime()
+        self._setCompileTime()
+
+    def _setChangeTime(self):
+        stats = os.stat(self.filePath)
+        self.st_mtime = stats.st_mtime
+        
+    def _setCompileTime(self):
+        pass
 
     def getInfo(self):
-        return [ self.objectName, self.st_mtime, self.compileTime ]
+        return { 'path' : self.filePath, 'objName' : self.objectName, 'deps' :  
+                 self.dependsOnObject, 'mtime' : self.st_mtime, 'compTime' : self.compileTime }
