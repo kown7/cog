@@ -16,9 +16,13 @@ class FileHandler(object):
 
         self.objectName = None
         self.objectType = FileType.Undefined
+        self.library = 'work'
         self.st_mtime = None
         self.compileTime = None
         self.dependsOnObject = []
+        # Set to false if compile time and modification time has not
+        # changed since last run.
+        self.modified = True
 
         self._setChangeTime()
         self._setCompileTime()
@@ -31,5 +35,7 @@ class FileHandler(object):
         pass
 
     def getInfo(self):
-        return { 'path' : self.filePath, 'objName' : self.objectName, 'deps' :  
-                 self.dependsOnObject, 'mtime' : self.st_mtime, 'compTime' : self.compileTime }
+        return { 'path' : self.filePath, 'objName' : self.objectName,
+                 'lib' : self.library, 'deps' : self.dependsOnObject,
+                 'modified' : self.modified, 'mtime' : self.st_mtime,
+                 'compTime' : self.compileTime }
