@@ -17,17 +17,12 @@ General behaviour:
 
 ''' 
 
-import logging
-import json
-import os
 import pprint
-import copy
-
-from cog import *
+import cog
 
 print("I'll have my own compile-order-generator (cog), with blackjack and hookers.")
 
-f = cog( basedir = '/home/kristoffer/eedge', top='../../eedge/sourcecode/HardOut.vhd',
+f = cog.cog( basedir = '/home/kristoffer/eedge', top='../../eedge/sourcecode/HardOut.vhd',
           ignoreLibs = ['fsa0a_c_generic_core', 'fsa0a_c_generic_core', 'fsa0a_c_t33_generic_io'])
 f.loadCache()
 f.parse()

@@ -1,15 +1,34 @@
-#!/usr/bin/python3
+''' cog.py
+Copyright (c) Kristoffer Nordström, All rights reserved.
 
-'''
-General behaviour:
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 3.0 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library.
+
+------------------------------------------------------
+
+Usage:
+
+General:
  - setup config 
  - load cache
- - load current compile times
+ - load current compile times TODO
  - TreeWalker parse
- - order List
+ - order list
  - compile
- - update compile times
+ - update compile times TODO
  - store cache
+
+The debug level needs to be set with the constructor
 ''' 
 
 import logging
@@ -27,7 +46,7 @@ class cog(object):
         # Directories not to be parsed; relative to basedir
         self.exclude = kwargs.get('exclude', [])
         # File path needs to absolute
-        self.topFile = os.path.abspath(kwargs.get('top', None))
+        self.topFile = os.path.abspath(kwargs.get('top', ''))
         # Should not be None, as it may trigger weird behaviour
         self.ignoreLibs = kwargs.get('ignoreLibs', [])
         self.debug = kwargs.get('debug', False)
