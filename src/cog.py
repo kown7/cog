@@ -24,9 +24,11 @@ class cog(object):
     def __init__(self, **kwargs):
         self.basedir = kwargs.get('basedir', os.path.expanduser('~'))
         self.lib = kwargs.get('lib', 'work')
+        # Directories not to be parsed; relative to basedir
         self.exclude = kwargs.get('exclude', [])
+        # File path needs to absolute
         self.topFile = os.path.abspath(kwargs.get('top', None))
-        # Should not be None, as it may trigger wierd behaviour
+        # Should not be None, as it may trigger weird behaviour
         self.ignoreLibs = kwargs.get('ignoreLibs', [])
         self.debug = kwargs.get('debug', False)
         self.col = []
