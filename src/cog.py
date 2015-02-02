@@ -20,141 +20,151 @@ import copy
 
 from TreeWalker import *
 
-print("I'll have my own compile-order-generator (cog), with blackjack and hookers.")
+class cog(object):
+    def __init__(self, **kwargs):
+        self.basedir = kwargs.get('basedir', os.path.expanduser('~'))
+        self.lib = kwargs.get('lib', 'work')
+        self.exclude = kwargs.get('exclude', [])
+        self.topFile = os.path.abspath(kwargs.get('top', None))
+        # Should not be None, as it may trigger wierd behaviour
+        self.ignoreLibs = kwargs.get('ignoreLibs', [])
+        self.debug = kwargs.get('debug', False)
+        self.col = []
 
-basedir='/home/kristoffer/eedge/sourcecode/'
-xclude=['/tb']
-# Should not be None, as it may trigger wierd behaviour
-ignoreLibs=['fsa0a_c_generic_core', 'fsa0a_c_generic_core', 'fsa0a_c_t33_generic_io']
-assert ignoreLibs != None , 'ignoreLibs may not be None'
-#logging.basicConfig(level=logging.DEBUG)
+        self._cache = None
+        self._parsedTree = None
+        self._cacheFile = os.path.expanduser('~') + '/.cog.py.stash'
+        
+        if self.debug:
+            logging.basicConfig(level=logging.DEBUG)
 
-
-def generateDependencyTree(parsedTreeInp):
-    ABORT_LIMIT = 10000
-    iterCount = 0
-    parsedTree = copy.copy(parsedTreeInp)
-    col = [] # compile order list
-    colFp = [] # compile order list with filenames instead
+        #assert self.ignoreLibs != None , 'ignoreLibs may not be None'
+        
     
-    while len(parsedTree) > 0:
-        for key in parsedTree:
-            if isInCol(parsedTree[key]['deps'], col, parsedTree):
-                col.append([parsedTree[key]['lib'], parsedTree[key]['objName']])
-                colFp.append([parsedTree[key]['lib'], parsedTree[key]['path']])
-                del parsedTree[key]
-                break
-        if iterCount == ABORT_LIMIT:
-            #pprint.pprint(col)
-            #pprint.pprint(parsedTree)
-            raise Exception
+    def parse(self):
+        tw = TreeWalker(self.basedir, self.lib, '', self.exclude, self._cache)
+        self._parsedTree = tw.parse()
+
+    def genTreeAll(self):
+        self.col = self._generateDependencyTree(self._parsedTree)
+
+    def genTreeFile(self, *args):
+        if len(args) > 0:
+            self.topFile = os.path.abspath(args[0])
+        if os.path.isfile(self.topFile):
+            self.col = self._generateDependencyFile()
         else:
-            iterCount += 1
+            logging.error('File does not exist: ' + self.topFile)
             
-    return colFp
-
-
-
-def isInCol(deps, col, parsedTree):
-    for dep in deps:
+            
+    def loadCache(self):
         try:
-            ignoreLibs.index(dep[0])
-            continue # next element
+            with open(self._cacheFile, 'r') as fp:
+                self._cache = json.load(fp)
         except:
-            pass
+            self._cache = None
+            loggin.warning('Could not open cache file')
+
             
-        try:
-            # Assume if library is not given, that it's a VHDL file
-            # with default library 'work'
-            if dep[0] == None:
-                col.index(['work', dep[1]])
+    def saveCache(self):
+        with open(self._cacheFile, 'w') as f:
+            f.write(json.dumps(self._cache))
+        
+
+    def _generateDependencyTree(self, parsedTreeInp):
+        ABORT_LIMIT = 10000
+        iterCount = 0
+        parsedTree = copy.copy(parsedTreeInp)
+        col = [] # compile order list
+        colFp = [] # compile order list with filenames instead
+
+        while len(parsedTree) > 0:
+            for key in parsedTree:
+                if self._isInCol(parsedTree[key]['deps'], col, parsedTree):
+                    col.append([parsedTree[key]['lib'], parsedTree[key]['objName']])
+                    colFp.append([parsedTree[key]['lib'], parsedTree[key]['path']])
+                    del parsedTree[key]
+                    break
+            if iterCount == ABORT_LIMIT:
+                #pprint.pprint(col)
+                #pprint.pprint(parsedTree)
+                raise Exception
             else:
-                col.index(dep)
-        except:
-            if dep[0] == None and isInTree(dep[1], parsedTree) == False:
+                iterCount += 1
+
+        return colFp
+
+
+
+    def _isInCol(self, deps, col, parsedTree):
+        for dep in deps:
+            try:
+                self.ignoreLibs.index(dep[0])
+                continue # next element
+            except:
                 pass
-            else:
-                return False
-    return True
+
+            try:
+                # Assume if library is not given, that it's a VHDL file
+                # with default library 'work'
+                if dep[0] == None:
+                    col.index(['work', dep[1]])
+                else:
+                    col.index(dep)
+            except:
+                if dep[0] == None and self._isInTree(dep[1], parsedTree) == False:
+                    pass
+                else:
+                    return False
+        return True
 
 
-def isInTree(entity, parsedTree):
-    for key in parsedTree:
-        if parsedTree[key]['objName'].lower() == entity:
-            if parsedTree[key]['lib'].lower() != 'work':
-                loggin.warning('Object ' + entity + ' found in library ' + parsedTree[key]['lib'])
-            return True
-    return False
+    def _isInTree(self, entity, parsedTree):
+        for key in parsedTree:
+            if parsedTree[key]['objName'].lower() == entity:
+                if parsedTree[key]['lib'].lower() != 'work':
+                    loggin.warning('Object ' + entity + ' found in library ' + parsedTree[key]['lib'])
+                return True
+        return False
 
 
 
-def generateDependencyFile(parsedTree, filename):
-    absFilename = os.path.abspath(filename)
-    parsedTreeSubset = {}
-    
-    reqFiles = _sampleReqFiles(parsedTree, absFilename)
-    print (reqFiles)
-    
-    for i in reqFiles:
-        parsedTreeSubset[i] = parsedTree[i]
+    def _generateDependencyFile(self):
+        absFilename = os.path.abspath(self.topFile)
+        parsedTreeSubset = {}
 
-    return generateDependencyTree(parsedTreeSubset)
-    
+        reqFiles = self._sampleReqFiles(absFilename)
 
-def _sampleReqFiles(parsedTree, filename):
-    absFilename = os.path.abspath(filename)
-    curStat = os.stat(absFilename)
-    curInodeStr = str(curStat.st_ino)
-    reqFiles = [curInodeStr]
+        for i in reqFiles:
+            parsedTreeSubset[i] = self._parsedTree[i]
 
-    for dep in parsedTree[curInodeStr]['deps']:
-        if len(dep) > 0:
-            ret = _callSampleReqFilesByObjName(parsedTree, dep)
-            for i in ret:
-                try:
-                    reqFiles.index(i)
-                except:
-                    reqFiles.append(i)
-
-    return reqFiles
-            
+        return self._generateDependencyTree(parsedTreeSubset)
 
 
-def _callSampleReqFilesByObjName(parsedTree, dep):
-    for key in parsedTree:
-        if ((parsedTree[key]['lib'].lower() == dep[0] or dep[0] == None)
-            and parsedTree[key]['objName'].lower() == dep[1]):
-            return _sampleReqFiles(parsedTree, parsedTree[key]['path'])
-    logging.warning('Not found ' + str(dep))
-    return []
+    def _sampleReqFiles(self, filename):
+        absFilename = os.path.abspath(filename)
+        curStat = os.stat(absFilename)
+        curInodeStr = str(curStat.st_ino)
+        reqFiles = [curInodeStr]
 
-    
-f = TreeWalker(basedir, 'work', '', None, None)
-fparsed = f.parse()
-#pprint.pprint (generateDependencyTree(fparsed))
-pprint.pprint (generateDependencyFile(fparsed, basedir+'/HardOut.vhd' ))
+        for dep in self._parsedTree[curInodeStr]['deps']:
+            if len(dep) > 0:
+                ret = self._callSampleReqFilesByObjName(dep)
+                for i in ret:
+                    try:
+                        reqFiles.index(i)
+                    except:
+                        reqFiles.append(i)
 
-print ('-----------------------------------------------')
-#g = TreeWalker(basedir, 'work', '', xclude, None)
-#gparsed = g.parse()
-#pprint.pprint (generateDependencyTree(gparsed))
+        return reqFiles
 
 
-print ('===============================================')
-home = os.path.expanduser('~')
-try:
-    with open(home + '/.cog.py.stash', 'r') as f:
-        hcached = json.load(f)
-except:
-    hcached = None
-h = TreeWalker('/home/kristoffer/I2C_Slave', 'work', '', None, hcached)
-print ('-----------------------------------------------')
-with open(home + '/.cog.py.stash', 'w') as f:
-    hparsed = h.parse()
-    f.write(json.dumps(hparsed))
 
-col = generateDependencyTree(hparsed)
-pprint.pprint (col)
-#pprint.pprint (hparsed)
-print(len(hparsed))
+    def _callSampleReqFilesByObjName(self, dep):
+        for key in self._parsedTree:
+            if ((self._parsedTree[key]['lib'].lower() == dep[0] or dep[0] == None)
+                and self._parsedTree[key]['objName'].lower() == dep[1]):
+                return self._sampleReqFiles(self._parsedTree[key]['path'])
+        logging.warning('Not found ' + str(dep))
+        return []
 
