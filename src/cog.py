@@ -1,5 +1,5 @@
 ''' cog.py
-Copyright (c) Kristoffer Nordström, All rights reserved.
+Copyright (c) Kristoffer NordstrÃ¶m, All rights reserved.
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -41,10 +41,12 @@ from TreeWalker import *
 
 class cog(object):
     def __init__(self, **kwargs):
-        self.basedir = kwargs.get('basedir', os.path.expanduser('~'))
-        self.lib = kwargs.get('lib', 'work')
-        # Directories not to be parsed; relative to basedir
-        self.exclude = kwargs.get('exclude', [])
+        self.libs = []
+        if kwargs.get('basedir') :
+            self.libs.append({'basedir' : kwargs.get('basedir', os.path.expanduser('~')),
+            'lib' : kwargs.get('lib', 'work'), 
+            ## Directories not to be parsed; relative path to basedir
+            'exclude' : kwargs.get('exclude', [])})
         # File path needs to absolute
         self.topFile = os.path.abspath(kwargs.get('top', ''))
         # Should not be None, as it may trigger weird behaviour
@@ -53,7 +55,7 @@ class cog(object):
         self.col = []
 
         self._cache = None
-        self._parsedTree = None
+        self._parsedTree = {}
         self._cacheFile = os.path.expanduser('~') + '/.cog.py.stash'
         
         if self.debug:
@@ -63,8 +65,9 @@ class cog(object):
         
     
     def parse(self):
-        tw = TreeWalker(self.basedir, self.lib, '', self.exclude, self._cache)
-        self._parsedTree = tw.parse()
+        for lib in self.libs:
+            tw = TreeWalker(lib['basedir'], lib['lib'], '', lib['exclude'], self._cache)
+            self._parsedTree.update(tw.parse())
 
     def genTreeAll(self):
         self.col = self._generateDependencyTree(self._parsedTree)
@@ -90,6 +93,10 @@ class cog(object):
     def saveCache(self):
         with open(self._cacheFile, 'w') as f:
             f.write(json.dumps(self._cache))
+
+    def printCsv(self):
+        for obj in self.col:
+            print(obj[0] + ',' + obj[1])
         
 
     def _generateDependencyTree(self, parsedTreeInp):
