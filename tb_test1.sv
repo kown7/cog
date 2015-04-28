@@ -11,12 +11,32 @@ module TB_test1;
 	#5 Clock = 0;
      end
 
+   test1 i_DUT (Clock, Clear, Ain, Bin, ABout);
+   
 program test_test1;
+
+   default clocking cb @(posedge Clock);
+      default input #1 output #4;
+      input Ain, Bin;
+      output ABout;
+   endclocking // cb
+   
    initial begin
       #10 Clear = 1;
       #10 Clear = 0;
 
-      #10 Ain = 2;
+      @(cb) Ain = 2;
+      
+      //@(cb) assert (ABout == 5'h2);
+      assert (ABout == 5'h2);
+
+      // Wait three clock cycles
+      ##3;
+      
+      @(cb) Bin = 2;
+
+      
+      #100;
    end
    
 endprogram // test_test1

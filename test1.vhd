@@ -6,7 +6,7 @@
 -- Author     :   <kristoffer.nordstrom@HELVNB0100>
 -- Company    : 
 -- Created    : 2015-04-27
--- Last update: 2015-04-27
+-- Last update: 2015-04-28
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -62,7 +62,7 @@ begin  -- architecture str
       if Clr = '1' then
         AB <= to_unsigned(0, AB'length);
       else
-        AB <= unsigned(Test1_A) + unsigned(Test1_B);
+        AB <= resize(unsigned(Test1_A), AB'length) + resize(unsigned(Test1_B), AB'length);
       end if;
     end if;
   end process p_addAandB;

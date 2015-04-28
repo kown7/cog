@@ -1,0 +1,3 @@
+[submodule "sim/cog"]
+	path = sim/cog
+	url = https://github.com/CogPy/cog.git
