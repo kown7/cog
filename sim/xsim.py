@@ -6,4 +6,4 @@ from conf import *
 from simCompile import simCompile
 
 simCompile()
-call([XSIM, TB_ENTITY])
+call([VSIM,'-gui', '-do', 'wave.do', TB_ENTITY])

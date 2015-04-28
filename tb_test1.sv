@@ -11,7 +11,7 @@ module TB_test1;
 	#5 Clock = 0;
      end
 
-   test1 i_DUT (Clock, Clear, Ain, Bin, ABout);
+   test1 i_DUT (.Clk(Clock), .Clr(Clear), .Test1_A(Ain), .Test1_B(Bin), .Test1_AB(ABout));
    
 program test_test1;
 
@@ -22,14 +22,12 @@ program test_test1;
    endclocking // cb
    
    initial begin
-      #10 Clear = 1;
-      #10 Clear = 0;
+      ##10 Clear = 1;
+      ##100 Clear = 0;
 
       @(cb) Ain = 2;
+      @(cb) assert (ABout == 5'h2);
       
-      //@(cb) assert (ABout == 5'h2);
-      assert (ABout == 5'h2);
-
       // Wait three clock cycles
       ##3;
       
