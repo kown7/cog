@@ -1,17 +1,20 @@
 #!/usr/bin/python3
 
 from cog import *
-from subprocess import call, check_output
-import re
-import pprint
-import os
-from datetime import datetime
-import time
-import sys
-
 from conf import *
 
+from subprocess import call, check_output
+import sys
+import os
+import re
+
+from datetime import datetime
+import time
+import pprint
+
+
 def splitStringIter(foobar): return iter(foobar.splitlines())
+
 
 def modelsimCompensateOffset():
         lenv = os.environ.copy()
@@ -87,6 +90,9 @@ def modelsimLibParsed(curLib = 'work'):
 
 
 def simCompile():
+        os.chdir(BASEDIR+'sim'+os.sep)
+        print(os.getcwd())
+
         try:
                 sys.argv.index('-f')
                 libContent = []
