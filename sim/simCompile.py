@@ -5,12 +5,34 @@ from conf import *
 
 from subprocess import call, check_output
 import sys
+import pdb
 import os
 import re
 
 from datetime import datetime
 import time
 import pprint
+
+
+class bcolors:
+        if not sys.platform.startswith('win'):
+                HEADER = '\033[95m'
+                OKBLUE = '\033[94m'
+                OKGREEN = '\033[92m'
+                WARNING = '\033[93m'
+                FAIL = '\033[91m'
+                ENDC = '\033[0m'
+                BOLD = '\033[1m'
+                UNDERLINE = '\033[4m'
+        else:
+                HEADER = ''
+                OKBLUE = ''
+                OKGREEN = ''
+                WARNING = ''
+                FAIL = ''
+                ENDC = ''
+                BOLD = ''
+                UNDERLINE = ''
 
 
 def splitStringIter(foobar): return iter(foobar.splitlines())
@@ -44,8 +66,11 @@ def modelsimCompile(f):
                         compiler = VLOG
 
 
-                parms = [compiler, COMPILE_OPTIONS, '-work', fp[0],fp[1]]
-                call(parms, env=lenv)
+                parms = [compiler]+COMPILE_OPTIONS+['-work', fp[0],fp[1]]
+                i = call(parms, env=lenv)
+                if i != 0:
+                        input(bcolors.WARNING+'Enter to terminate'+bcolors.ENDC)
+                        raise SystemExit
 
 
 def modelsimLibParsed(curLib = 'work'):
