@@ -13,11 +13,4 @@ elif sys.platform.startswith('win'):
     MODELSIM = 'E:\\modeltech_pe_10.4a\\win32pe\\'
     BASEDIR = 'C:\\Users\\kn\\Documents\\workspace\\test1\\'
 
-
 TB_FILE = BASEDIR + 'tb_test1.sv'
-
-VLOG = MODELSIM + 'vlog.exe'
-VCOM = MODELSIM + 'vcom.exe'
-VLIB = MODELSIM + 'vlib.exe'
-VSIM = MODELSIM + 'vsim.exe'
-VDIR = MODELSIM + 'vdir.exe'
