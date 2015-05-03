@@ -1,4 +1,4 @@
-''' cog.py
+'''cog.py
 Copyright (c) Kristoffer Nordström, All rights reserved.
 
 This library is free software; you can redistribute it and/or
@@ -17,19 +17,22 @@ License along with this library.
 ------------------------------------------------------
 
 Usage:
+   In general the following:
+    - setup config
+    - load cache
+    - load current compile times
+    - TreeWalker parse
+    - order list
+    - compile
+    - update compile times
+    - store cache
+    See also the runAll() function.
 
-General:
- - setup config 
- - load cache
- - load current compile times TODO
- - TreeWalker parse
- - order list
- - compile
- - update compile times TODO
- - store cache
+Compiler implementation need to implement the cogCompiler Interface
+class.
 
 The debug level needs to be set with the constructor
-''' 
+'''
 
 import logging
 import json
@@ -37,14 +40,16 @@ import os
 import pprint
 import copy
 
-from TreeWalker import *
+from .TreeWalker import *
+from .CogFileType import *
+
 
 class cog(object):
     def __init__(self, **kwargs):
         self.libs = []
         if kwargs.get('basedir') :
             self.libs.append({'basedir' : kwargs.get('basedir', os.path.expanduser('~')),
-            'lib' : kwargs.get('lib', 'work'), 
+            'lib' : kwargs.get('lib', 'work'),
             ## Directories not to be parsed; relative path to basedir
             'exclude' : kwargs.get('exclude', [])})
         # File path needs to absolute
@@ -53,24 +58,28 @@ class cog(object):
         self.ignoreLibs = kwargs.get('ignoreLibs', [])
         self.debug = kwargs.get('debug', False)
         self.col = []
+        # Assign compiler object to have runAll fun.
+        self.comp = None 
 
         self._cache = None
         self._parsedTree = {}
         self._cacheFile = os.path.expanduser('~') + '/.cog.py.stash'
-        
+
         if self.debug:
             logging.basicConfig(level=logging.DEBUG)
 
         #assert self.ignoreLibs != None , 'ignoreLibs may not be None'
-        
-    
+
+
     def parse(self):
         for lib in self.libs:
             tw = TreeWalker(lib['basedir'], lib['lib'], '', lib['exclude'], self._cache)
             self._parsedTree.update(tw.parse())
 
+
     def genTreeAll(self):
         self.col = self._generateDependencyTree(self._parsedTree)
+
 
     def genTreeFile(self, *args):
         if len(args) > 0:
@@ -79,17 +88,28 @@ class cog(object):
             self.col = self._generateDependencyFile()
         else:
             logging.error('File does not exist: ' + self.topFile)
-            
-            
+
+
     def loadCache(self):
         try:
             with open(self._cacheFile, 'r') as fp:
                 self._cache = json.load(fp)
         except:
             self._cache = None
-            loggin.warning('Could not open cache file')
+            logging.warning('Could not open cache file')
 
-            
+
+    def importCompileTimes(self, designs):
+        if not self._parsedTree:
+            raise Exception
+        for inode in designs:
+            if self._parsedTree[inode]:
+                try:
+                    self._parsedTree[inode].update({'ctime' : designs[inode]['ctime']})
+                except:
+                    logging.warning('No ctime found for ' + designs[inode]['name'])
+
+
     def saveCache(self):
         with open(self._cacheFile, 'w') as f:
             f.write(json.dumps(self._cache))
@@ -97,25 +117,41 @@ class cog(object):
     def printCsv(self):
         for obj in self.col:
             print(obj[0] + ',' + obj[1])
-        
+
+    def runAll(self):
+        self.loadCache()
+        self.parse()
+        self.importCompileTimes(self.comp.getLibsContent(self.libs))
+        self.genTreeAll()
+        self.comp.compileAllFiles()
+        self.saveCache()
+
 
     def _generateDependencyTree(self, parsedTreeInp):
         ABORT_LIMIT = 10000
         iterCount = 0
         parsedTree = copy.copy(parsedTreeInp)
         col = [] # compile order list
+        colIgnore = [] # dependencies not to be compiled
         colFp = [] # compile order list with filenames instead
 
         while len(parsedTree) > 0:
             for key in parsedTree:
-                if self._isInCol(parsedTree[key]['deps'], col, parsedTree):
-                    col.append([parsedTree[key]['lib'], parsedTree[key]['objName']])
-                    colFp.append([parsedTree[key]['lib'], parsedTree[key]['path']])
+                if self._isInCol(parsedTree[key]['deps'], colIgnore, parsedTree):
+                    if parsedTree[key]['mtime'] < parsedTree[key]['ctime']:
+                        colIgnore.append([parsedTree[key]['lib'], parsedTree[key]['objName']])
+                    else:
+                        col.append([parsedTree[key]['lib'], parsedTree[key]['objName']])
+                        colFp.append([parsedTree[key]['lib'], parsedTree[key]['path'], parsedTree[key]['type']])
                     del parsedTree[key]
                     break
+                elif self._isInCol(parsedTree[key]['deps'], col, parsedTree):
+                    col.append([parsedTree[key]['lib'], parsedTree[key]['objName']])
+                    colFp.append([parsedTree[key]['lib'], parsedTree[key]['path'], parsedTree[key]['type']])
+                    del parsedTree[key]
+                    break
+
             if iterCount == ABORT_LIMIT:
-                #pprint.pprint(col)
-                #pprint.pprint(parsedTree)
                 raise Exception
             else:
                 iterCount += 1
@@ -195,4 +231,3 @@ class cog(object):
                 return self._sampleReqFiles(self._parsedTree[key]['path'])
         logging.warning('Not found ' + str(dep))
         return []
-

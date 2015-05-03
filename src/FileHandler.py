@@ -1,11 +1,8 @@
-#from os import listdir 
 import os
 import logging
 
-class FileType(object):
-    Undefined = None
-    VhdlEntity = 1
-    VhdlPackage = 2
+from .CogFileType import *
+
 
 class FileHandler(object):
     def __init__(self, path, filename, lib):
@@ -15,10 +12,10 @@ class FileHandler(object):
         self.filePath = path + '/' + filename
 
         self.objectName = None
-        self.objectType = FileType.Undefined
+        self.objectType = CogFileType.Undefined
         self.library = 'work'
-        self.st_mtime = None
-        self.compileTime = None
+        self.st_mtime = 0
+        self.compileTime = 0
         self.dependsOnObject = []
         # Set to false if compile time and modification time has not
         # changed since last run.
@@ -35,7 +32,8 @@ class FileHandler(object):
         pass
 
     def getInfo(self):
+        # ctime : compile time 
         return { 'path' : self.filePath, 'objName' : self.objectName,
                  'lib' : self.library, 'deps' : self.dependsOnObject,
                  'modified' : self.modified, 'mtime' : self.st_mtime,
-                 'compTime' : self.compileTime }
+                 'ctime' : self.compileTime, 'type' : self.objectType }

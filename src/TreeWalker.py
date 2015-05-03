@@ -18,8 +18,8 @@ License along with this library.
 import os
 import logging
 
-from VhdlFileHandler import *
-#from FileHandler import *
+from .VhdlFileHandler import *
+from .SvFileHandler import *
 
 class TreeWalker(object):
     def __init__(self, basedir, lib, path, exclude, cached):
@@ -52,7 +52,6 @@ class TreeWalker(object):
                 try:
                     if (self.cached[curInodeStr]['path'] == curPath and
                         self.cached[curInodeStr]['mtime'] == curStat.st_mtime):
-                        # TODO : Account for compile time changes as well here
                         self.curEntries[curInodeStr] = self.cached[curInodeStr]
                         self.curEntries[curInodeStr]['modified'] = False
                     else:
@@ -61,6 +60,20 @@ class TreeWalker(object):
                 except:
                     logging.debug('VHDL file parsing: ' + i)
                     f = VhdlFileHandler(self.curPath, i, self.lib)
+                    f.parse()
+                    self.curEntries.update({str(curStat.st_ino) : f.getInfo()})
+            elif i.lower().endswith(('.sv')):
+                try:
+                    if (self.cached[curInodeStr]['path'] == curPath and
+                        self.cached[curInodeStr]['mtime'] == curStat.st_mtime):
+                        self.curEntries[curInodeStr] = self.cached[curInodeStr]
+                        self.curEntries[curInodeStr]['modified'] = False
+                    else:
+                        print ('raise E')
+                        raise Exception
+                except:
+                    logging.debug('SystemVerilog file parsing: ' + i)
+                    f = SvFileHandler(self.curPath, i, self.lib)
                     f.parse()
                     self.curEntries.update({str(curStat.st_ino) : f.getInfo()})
                 

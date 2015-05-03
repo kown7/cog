@@ -17,7 +17,7 @@ License along with this library.
 
 import re
 
-from FileHandler import *
+from .FileHandler import *
 
 class VhdlFileHandler(FileHandler):
     def parse(self):
@@ -50,14 +50,14 @@ class VhdlFileHandler(FileHandler):
                     self.objectName = m.group(2)
                     logging.debug('Entity:'+ str(LineNum) +': ' + m.group(2))
                     if m.group(1) == "entity":
-                        self.objectType = FileType.VhdlEntity
+                        self.objectType = CogFileType.VhdlEntity
                     elif m.group(1) == 'package':
-                        self.objectType = FileType.VhdlPackage
+                        self.objectType = CogFileType.VhdlPackage
             else:
                 cntParentheses += Line.count('(') - Line.count(')')
 
             if cntParentheses == 0 and self.objectName != None and endFound == False:
-                m = re.search('end(\s*;|\s+(package\s+)*'+self.objectName.lower()+'\s*;)', Line.lower())
+                m = re.search('end(\s*;|\s+((entity|package)\s+)*'+self.objectName.lower()+'\s*;)', Line.lower())
                 if m != None:
                     logging.debug('End Object ' + self.objectName + ":" + str(LineNum))
                     endFound = True
