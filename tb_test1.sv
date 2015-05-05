@@ -6,7 +6,7 @@ module TB_test1;
    wire [4:0] ABout;
 
    always
-     begin
+     begin : std_clock
 	#5 Clock = 1;
 	#5 Clock = 0;
      end
@@ -85,5 +85,19 @@ program test_test1;
    endtask; // assertABio
 
 endprogram // test_test1
+
+program assert_subthings;
+   initial begin
+      #1218ns;
+      
+      if (TB_test1.i_DUT.AB == 26) begin
+      	 $display("pipapo, everything fine.");
+      end
+      else begin
+	 $display("Something else");
+      end;
+   end;
+endprogram // assert_subthings
+      
 
 endmodule // TB_test1

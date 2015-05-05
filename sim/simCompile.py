@@ -31,5 +31,6 @@ def simCompile():
         f.comp.compileAllFiles(f.col)
         f.saveCache()
         #pdb.set_trace()
+        return f
 
 simCompile()
