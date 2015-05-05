@@ -16,21 +16,17 @@ import pprint
 
 def simCompile():
         os.chdir(BASEDIR+'sim'+os.sep)
-        print(os.getcwd())
+
+        try:  sys.argv.index('-f')
+        except: forceCompile = False
+        else: forceCompile = True
 
         #f = cog.cog( basedir=BASEDIR, top=TB_FILE, debug=1 )
         f = cog( basedir=BASEDIR, top=TB_FILE )
         f.comp = modelsimCompiler(MODELSIM)
         f.comp.compileOptions = COMPILE_OPTIONS
-        
-        f.loadCache()
-        f.parse()
-        try:  sys.argv.index('-f')
-        except:  f.importCompileTimes(f.comp.getLibsContent(f.libs))
-        f.genTreeAll()
-        f.comp.compileAllFiles(f.col)
-        f.saveCache()
-        #pdb.set_trace()
+
+        f.runAll(forceCompile)
         return f
 
 simCompile()
