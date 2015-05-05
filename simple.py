@@ -18,7 +18,7 @@ General behaviour:
 ''' 
 
 import pprint
-import cog
+from src import cog
 
 print("I'll have my own compile-order-generator (cog), with blackjack and hookers.")
 

@@ -57,6 +57,7 @@ class cog(object):
         # Should not be None, as it may trigger weird behaviour
         self.ignoreLibs = kwargs.get('ignoreLibs', [])
         self.debug = kwargs.get('debug', False)
+        # col : compile order list
         self.col = []
         # Assign compiler object to have runAll fun.
         self.comp = None 
