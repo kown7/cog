@@ -119,12 +119,13 @@ class cog(object):
         for obj in self.col:
             print(obj[0] + ',' + obj[1])
 
-    def runAll(self):
+    def runAll(self, forceCompile = False):
         self.loadCache()
         self.parse()
-        self.importCompileTimes(self.comp.getLibsContent(self.libs))
+        if not forceCompile:
+            self.importCompileTimes(self.comp.getLibsContent(self.libs))
         self.genTreeAll()
-        self.comp.compileAllFiles()
+        self.comp.compileAllFiles(self.col)
         self.saveCache()
 
 
