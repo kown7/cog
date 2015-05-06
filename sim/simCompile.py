@@ -21,7 +21,7 @@ def simCompile():
         except: forceCompile = False
         else: forceCompile = True
 
-        #f = cog.cog( basedir=BASEDIR, top=TB_FILE, debug=1 )
+        #f = cog( basedir=BASEDIR, top=TB_FILE, debug=1 )
         f = cog( basedir=BASEDIR, top=TB_FILE )
         f.comp = modelsimCompiler(MODELSIM)
         f.comp.compileOptions = COMPILE_OPTIONS

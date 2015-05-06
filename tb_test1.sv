@@ -1,49 +1,78 @@
 include abSources.sv;
-  
-module TB_test1;
+
+interface dutif (input Clock);
+   logic Clear = 0;
+   logic [3:0] Ain = 0, Bin = 0;
+   logic [4:0] ABout;
+
+   wire [4:0] ABL;
+   assign ABL = ABout;
+
+   default clocking cb @(posedge Clock);
+      default input #1ns output #1ns;
+      output Ain, Bin, Clear;
+      input ABout;
+   endclocking // cb
+
+   modport tb ( input Clock, clocking cb);
+endinterface // dutif
+
+
+module DUTSV(dutif iface);
+   test1 i_DUT (.Clk(iface.Clock), .Clr(iface.Clear), .Test1_A(iface.Ain), .Test1_B(iface.Bin), .Test1_AB(iface.ABout));
+endmodule // DUTSV
+
+module top;
    timeunit 1ns;
+   reg Clock;
+      
+   dutif iface(Clock);
 
-   reg Clock = 0, Clear = 0;
-   reg [3:0] Ain = 0, Bin = 0;
-   wire [4:0] ABout;
-
+   DUTSV DUT(iface);
+   TB_test1 TB(iface);
+   
+      
    always
      begin : std_clock
 	#5 Clock = 1;
 	#5 Clock = 0;
      end
+endmodule // top
+   
 
-   test1 i_DUT (.Clk(Clock), .Clr(Clear), .Test1_A(Ain), .Test1_B(Bin), .Test1_AB(ABout)); 
+   
+module TB_test1(dutif.tb iface);
 
 program test_test1;
-
+   default clocking cbl @(posedge(iface.Clock));
+   endclocking // cbl
+      
    abSources absrc;
-   
-   default clocking cb @(posedge Clock);
-      default input #1 output #4;
-      input Ain, Bin;
-      output ABout;
-   endclocking // cb
 
    initial begin
       absrc = new;
 
-      ##10 Clear = 1;
-      ##100 Clear = 0;
+      ##10 ;
+      iface.cb.Clear <= 1;
+      ##100;
+      iface.cb.Clear <= 0;
 
-      @(cb) Ain = 2;
-      @(cb) assert (ABout == 5'h2);
+      iface.cb.Ain <= 2;
+      ##1;
+      @(iface.cb) assert (iface.cb.ABout == 5'h2);
 
       // Wait three clock cycles
       ##3;
 
+      $display("Start loop");
+
       for (int i = 0; i < 3; i++) begin
 	 // Missing licence for randomize()
 	 //absrc.randomize();
-	 @(cb) absrc.inc();
-	 absrc.print();
-	 Ain = absrc.Ain;
-	 Bin = absrc.Bin;
+	 @(cbl) absrc.inc();
+	 //absrc.print();
+	 iface.cb.Ain <= absrc.Ain;
+	 iface.cb.Bin <= absrc.Bin;
 	 fork
 	    assertABio(absrc.Ain, absrc.Bin);
 	 join_none;
@@ -51,31 +80,36 @@ program test_test1;
 
       #100;
    end // initial begin
-   
-   
-   task assertABio;
-      input a, b;
-      integer a, b;
+
+
+   task automatic assertABio(input int a, b);
+      int al, bl;
       begin
-	 ##2 assert (ABout == (a + b)) $display("Good A: %2d; B: %2d\n", a, b);
-	     else $error("Bad A: %2d; B: %2d\n", a, b);
+	 al = a;
+	 bl = b;
+	 ##1
+	 @(iface.cb) assert (iface.cb.ABout == (al + bl)) begin
+	    $display("Good A: %2d; B: %2d; ABout: %2d; (B: %2d)\n", al, bl, iface.cb.ABout, iface.cb.Bin);
+	 end else begin
+	    $error("Bad A: %2d; B: %2d; ABout: %2d; (B: %2d)\n", al, bl, iface.cb.ABout, iface.cb.Bin);
+	 end
       end;
    endtask; // assertABio
 
 endprogram // test_test1
 
-program assert_subthings;
-   initial begin
-      #1218ns;
-      
-      if (TB_test1.i_DUT.AB == 26) begin
-      	 $display("pipapo, everything fine.");
-      end
-      else begin
-	 $display("Something else");
-      end;
-   end;
-endprogram // assert_subthings
-      
+//program assert_subthings;
+//   initial begin
+//      #1218ns;
+//
+//      if (iface.dut.AB == 26) begin
+//      	 $display("pipapo, everything fine.");
+//      end
+//      else begin
+//	 $display("Something else");
+//      end;
+//   end;
+//endprogram // assert_subthings
 
 endmodule // TB_test1
+
