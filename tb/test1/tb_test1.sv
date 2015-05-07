@@ -22,15 +22,14 @@ module DUTSV(dutif iface);
    test1 i_DUT (.Clk(iface.Clock), .Clr(iface.Clear), .Test1_A(iface.Ain), .Test1_B(iface.Bin), .Test1_AB(iface.ABout));
 endmodule // DUTSV
 
-module top;
+module tb_test1;
    timeunit 1ns;
    reg Clock;
       
    dutif iface(Clock);
 
    DUTSV DUT(iface);
-   TB_test1 TB(iface);
-   
+   tb_mod TB(iface);
       
    always
      begin : std_clock
@@ -41,7 +40,7 @@ endmodule // top
    
 
    
-module TB_test1(dutif.tb iface);
+module tb_mod(dutif.tb iface);
 
 program test_test1;
    default clocking cbl @(posedge(iface.Clock));
@@ -97,19 +96,6 @@ program test_test1;
    endtask; // assertABio
 
 endprogram // test_test1
-
-//program assert_subthings;
-//   initial begin
-//      #1218ns;
-//
-//      if (iface.dut.AB == 26) begin
-//      	 $display("pipapo, everything fine.");
-//      end
-//      else begin
-//	 $display("Something else");
-//      end;
-//   end;
-//endprogram // assert_subthings
 
 endmodule // TB_test1
 
