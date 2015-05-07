@@ -2,6 +2,7 @@
 
 import sys
 import os
+import subprocess
 import shutil
 import errno
 import logging
@@ -42,7 +43,7 @@ copyItems = ['run.do', 'wave.do'] + ['simCompile.py', 'xsim.py']
 # From http://code.activestate.com/lists/python-list/27163/
 def force_symlink(file1, file2):
     if sys.platform == 'win32' and os.path.isdir(file1):
-        call(['mklink.exe', '/J', file2, file1])
+        subprocess.call(['cmd', '/c', 'mklink', '/J', file2, file1])
     try:
         os.symlink(file1, file2)
     except OSError as e:
