@@ -1,4 +1,6 @@
 #!/usr/bin/python3
-from conf import *
 
-[f, cfg]=simCompile()
+from cog import CogEnv
+
+ce = CogEnv()
+ce.compileAll()

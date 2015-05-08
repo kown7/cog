@@ -47,7 +47,7 @@ else:
 
 replaceItems = (('conf.tpl','conf.ini'),('wave.tpl','wave.do'))
 linkItems = []
-copyItems = ['run.do'] + ['simCompile.py', 'xsim.py', 'conf.py'] 
+copyItems = ['run.do'] + ['simCompile.py', 'xsim.py'] 
 
 
 ################################################################################

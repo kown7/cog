@@ -122,7 +122,7 @@ class cog(object):
         for obj in self.col:
             print(obj[0] + ',' + obj[1])
 
-    def runAll(self, forceCompile = False):
+    def compileAll(self, forceCompile = False):
         self.loadCache()
         self.parse()
         if not forceCompile:
