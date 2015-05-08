@@ -18,16 +18,11 @@ if len(sys.argv) == 4:
     # Assuming it's the same
     tbFileName = os.path.join(TB_DIR_PATH, sys.argv[2])
     tbEntity = '.'.join((sys.argv[2]).split('.')[0:-1])
-elif len(sys.argv) == 1:
-    BASE_DIR_PATH = os.path.abspath('..') + os.sep
-    TB_DIR_PATH = None
-    MODELSIM_PATH = '/cygdrive/e/modeltech_pe_10.4a/win32pe/'
-    simDirPath = BASE_DIR_PATH+os.sep+'sim'+os.sep
-    logging.warning('Using default settings; please check your conf.py file.')
-    raise SystemExit('Not supported')
 else:
-    logging.warning('Unsupported number of settings')
-    raise SystemExit
+    print('Usage: setup.py <src directory> <top file> <modelsim bin path>\n' + 
+          '\t<top file>:\tis assumed to be in a different directory;\n' +
+          '\t\t\tmay contain more files.\n')
+    raise SystemExit('Unsupported number of params')
 
 replacements = { '__MODELSIM_PATH__' : MODELSIM_PATH , '__TB_FILE__' : tbFileName,
                  '__TB_ENTITY__' : tbEntity}
