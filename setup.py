@@ -10,6 +10,20 @@ import pdb
 
 logging.basicConfig(level=logging.DEBUG)
 
+def helpMessage():
+    print('Usage: setup.py <src directory> <top file> <modelsim bin path>\n' + 
+          '\t<top file>:\tis assumed to be in a different directory;\n' +
+          '\t\t\tmay contain more files.\n')
+
+
+try:
+    sys.argv.index('-h')
+except:
+    pass
+else:
+    helpMessage()
+    raise SystemExit('All help there is!')
+
 if len(sys.argv) == 4:
     BASE_DIR_PATH = os.path.abspath(sys.argv[1])
     MODELSIM_PATH = os.path.abspath(sys.argv[3])
@@ -19,10 +33,8 @@ if len(sys.argv) == 4:
     tbFileName = os.path.join(TB_DIR_PATH, sys.argv[2])
     tbEntity = '.'.join((sys.argv[2]).split('.')[0:-1])
 else:
-    print('Usage: setup.py <src directory> <top file> <modelsim bin path>\n' + 
-          '\t<top file>:\tis assumed to be in a different directory;\n' +
-          '\t\t\tmay contain more files.\n')
-    raise SystemExit('Unsupported number of params')
+    message = 'Unsupported number of params'
+    raise SystemExit(message)
 
 replacements = { '__MODELSIM_PATH__' : MODELSIM_PATH , '__TB_FILE__' : tbFileName,
                  '__TB_ENTITY__' : tbEntity}
