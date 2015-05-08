@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 from cog import *
-from conf import *
 
 from subprocess import call, check_output
 import sys
@@ -12,7 +11,7 @@ import re
 from datetime import datetime
 import time
 import pprint
-
+import configparser
 
 def simCompile():
         os.chdir(os.path.join(BASEDIR[0], 'sim'))
@@ -31,5 +30,14 @@ def simCompile():
 
         f.runAll(forceCompile)
         return f
- 
+
+config = configparser.ConfigParser()
+config.read('conf.ini')
+TB_ENTITY = config.get('General', 'TB_ENTITY')
+COMPILE_OPTIONS = [x.strip() for x in config.get('General', 'COMPILE_OPTIONS').split(',')]
+SIM_OPTIONS = [x.strip() for x in config.get('General', 'SIM_OPTIONS').split(',')]
+MODELSIM = config.get('Files', 'MODELSIM')
+BASEDIR = [x.strip() for x in config.get('Files', 'BASEDIR').split(',')]
+TB_FILE = config.get('Files', 'TB_FILE')
+
 simCompile()

@@ -1,11 +1,9 @@
 #!/usr/bin/python3
 
-import os
 from subprocess import call
 
-from conf import *
 from cog import *
-from simCompile import simCompile
+from simCompile import *
 
 f = simCompile()
 f.comp.runSimulationGui(TB_ENTITY, SIM_OPTIONS)
