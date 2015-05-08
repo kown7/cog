@@ -26,11 +26,11 @@ class modelsimCompiler(cogCompilerInterface):
     @modelsimDir.setter
     def modelsimDir(self, val):
         self._modelsimDir = val
-        self.VLOG = self._modelsimDir + 'vlog.exe'
-        self.VCOM = self._modelsimDir + 'vcom.exe'
-        self.VLIB = self._modelsimDir + 'vlib.exe'
-        self.VSIM = self._modelsimDir + 'vsim.exe'
-        self.VDIR = self._modelsimDir + 'vdir.exe'
+        self.VLOG = os.path.join(self._modelsimDir, 'vlog.exe')
+        self.VCOM = os.path.join(self._modelsimDir, 'vcom.exe')
+        self.VLIB = os.path.join(self._modelsimDir, 'vlib.exe')
+        self.VSIM = os.path.join(self._modelsimDir, 'vsim.exe')
+        self.VDIR = os.path.join(self._modelsimDir, 'vdir.exe')
     _modelsimDir = None
     
     compileOptions = []
@@ -48,6 +48,10 @@ class modelsimCompiler(cogCompilerInterface):
     
     def _getLibParsed(self, curLib):
         lenv=self._modelsimCompensateOffset()
+        if not os.path.isdir(curLib):
+            try: call([self.VLIB, curLib])
+            except: raise SystemExit
+            
         try:
             libContent = check_output([self.VDIR, '-l', '-lib', curLib], env=lenv)
         except:

@@ -39,6 +39,7 @@ import json
 import os
 import pprint
 import copy
+import pdb
 
 from .TreeWalker import *
 from .CogFileType import *
@@ -71,6 +72,8 @@ class cog(object):
 
         #assert self.ignoreLibs != None , 'ignoreLibs may not be None'
 
+    def addLib(self, bdir, lib, exclude = []):
+        self.libs.append({'basedir' : bdir, 'lib' : lib, 'exclude' : exclude})
 
     def parse(self):
         for lib in self.libs:
@@ -154,6 +157,7 @@ class cog(object):
                     break
 
             if iterCount == ABORT_LIMIT:
+                pdb.set_trace()
                 raise Exception
             else:
                 iterCount += 1

@@ -30,13 +30,17 @@ else:
     raise SystemExit
 
 replacements = { '__MODELSIM_PATH__' : repr(MODELSIM_PATH) , '__TB_FILE__' : repr(tbFileName),
-                 '__TB_ENTITY__' : repr(tbEntity)}
+                 '__TB_ENTITY__' : repr(tbEntity), '__TB_ENTITY_RAW__' : tbEntity }
 if TB_DIR_PATH:
-    replacements.update({'__BASE_DIR_PATH__' : str([BASE_DIR_PATH, TB_DIR_PATH]) })
+    # TB_DIR_PATH is first, because simCompile uses the first
+    # entry+sim as the compile-location.
+    replacements.update({'__BASE_DIR_PATH__' : str([TB_DIR_PATH, BASE_DIR_PATH]) })
 else:
     replacements.update({ '__BASE_DIR_PATH__' : str([BASE_DIR_PATH]) })
+
+replaceItems = (('conf.tpl','conf.py'),('wave.tpl','wave.do'))
 linkItems = [] 
-copyItems = ['run.do', 'wave.do'] + ['simCompile.py', 'xsim.py']
+copyItems = ['run.do'] + ['simCompile.py', 'xsim.py']
 
 
 ################################################################################
@@ -66,16 +70,16 @@ except OSError :
     raise SystemExit
 
 cogDir = os.path.dirname(os.path.abspath(__file__))
-pdb.set_trace()
+#pdb.set_trace()
 
-
-with open(os.path.join(cogDir,'conf.tpl'), 'r') as srcFp:
-    with open(simDirPath+'conf.py', 'w') as destFp:
-        for line in srcFp:
-            for src, target in replacements.items():
-                line = line.replace(src, target)
-            destFp.write(line)
-            logging.debug(line)
+for src, dest in replaceItems:
+    with open(os.path.join(cogDir,src), 'r') as srcFp:
+        with open(os.path.join(simDirPath,dest), 'w') as destFp:
+            for line in srcFp:
+                for src, target in replacements.items():
+                    line = line.replace(src, target)
+                destFp.write(line)
+                logging.debug(line)
 
 force_symlink(cogDir, os.path.join(simDirPath, 'cog'))
 for i in linkItems:
