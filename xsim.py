@@ -1,11 +1,8 @@
 #!/usr/bin/python3
+import pdb
+from conf import *
 
-from subprocess import call
+[f, cfg] = simCompile()
+f.comp.runSimulationGui(cfg.TB_ENTITY, cfg.SIM_OPTIONS)
 
-from cog import *
-from simCompile import *
 
-f = simCompile()
-f.comp.runSimulationGui(TB_ENTITY, SIM_OPTIONS)
-#comp = modelsimCompiler(MODELSIM)
-#call([comp.VSIM,'-gui', '-do', 'wave.do']+SIM_OPTIONS+[TB_ENTITY])

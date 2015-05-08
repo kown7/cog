@@ -47,7 +47,7 @@ else:
 
 replaceItems = (('conf.tpl','conf.ini'),('wave.tpl','wave.do'))
 linkItems = []
-copyItems = ['run.do'] + ['simCompile.py', 'xsim.py'] 
+copyItems = ['run.do'] + ['simCompile.py', 'xsim.py', 'conf.py'] 
 
 
 ################################################################################
@@ -89,4 +89,4 @@ force_symlink(cogDir, os.path.join(simDirPath, 'cog'))
 for i in linkItems:
     force_symlink(os.path.join(cogDir, i), os.path.join(simDirPath, i))
 for i in copyItems:
-    shutil.copy(os.path.join(cogDir, i), os.path.join(simDirPath, i))
+    shutil.copyfile(os.path.join(cogDir, i), os.path.join(simDirPath, i))
