@@ -23,6 +23,9 @@ class SvFileHandler(FileHandler):
                     self.dependsOnObject.append([self.library, m.group(1).lower()])
                 
                 if self.objectName == None:
+                    # The top-level module does not implement
+                    # interfaces and the like, hence the ';'. Should
+                    # be parameterized.
                     m = re.search('module\s+('+SvIdentifier+')\s*;', Line.lower())
                     if m != None:
                         self.objectName = m.group(1)
