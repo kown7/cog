@@ -117,7 +117,11 @@ class modelsimCompiler(cogCompilerInterface):
                     logging.warning('No compiler found for object: ' + fp[1])
                     continue
 
-                parms = [compiler]+self.compileOptions+['-work', fp[0],fp[1]]
+                if sys.platform == 'cygwin':
+                    decFname = check_output(['cygpath.exe', '-w', fp[1]]).decode('utf-8').strip()
+                else:
+                    decFname = fp[1]
+                parms = [compiler]+self.compileOptions+['-work', fp[0], decFname]
                 i = call(parms, env=lenv)
                 if i != 0:
                         input(bcolors.WARNING+'Enter to terminate'+bcolors.ENDC)
