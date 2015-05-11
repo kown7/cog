@@ -2,8 +2,8 @@
 from cog import CogEnv
 
 ce = CogEnv()
-ce.compileAll()
-rV = ce.runSimulation()
+ce.compile_all()
+rV = ce.run_simulation()
 
 if rV: # Exit zero is good
     #pdb.set_trace()

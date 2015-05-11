@@ -16,8 +16,10 @@ License along with this library.
 '''
 
 import re
+import logging
 
-from .FileHandler import *
+from .FileHandler import FileHandler
+from .CogFileType import CogFileType
 
 class VhdlFileHandler(FileHandler):
     def parse(self):

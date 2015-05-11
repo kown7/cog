@@ -18,8 +18,8 @@ License along with this library.
 import os
 import logging
 
-from .VhdlFileHandler import *
-from .SvFileHandler import *
+from .VhdlFileHandler import VhdlFileHandler
+from .SvFileHandler import SvFileHandler
 
 class TreeWalker(object):
     def __init__(self, basedir, lib, path, exclude, cached):
@@ -27,63 +27,62 @@ class TreeWalker(object):
         self.lib = lib
         self.path = path
         self.exclude = exclude
-        self.curPath = basedir + path
-        self.ls = os.listdir(self.curPath)
-        self.curEntries = {}
+        self.cpath = os.path.join(basedir, path)
+        self.lsfiles = os.listdir(self.cpath)
+        self.centries = {}
         self.cached = cached
-                
-        logging.debug(self.ls)
 
-                
-    def _returnValues(self):
-        return self.curEntries
+        logging.debug(self.lsfiles)
 
-            
-    def _parseCurPath(self):
-        for i in self.ls:
-            curPath = self.curPath + '/' + i
-            curStat = os.stat(curPath)
-            curInodeStr = str(curStat.st_ino)
-            logging.debug(i + ": " + str(curStat.st_mtime))
-            if os.path.isdir(curPath):
-                f = TreeWalker(self.basedir, self.lib, self.path + '/' + i, self.exclude, self.cached)
-                self.curEntries.update(f.parse())
+
+    def _return_values(self):
+        return self.centries
+
+
+    def _parse_current_path(self):
+        for i in self.lsfiles:
+            cur_path = os.path.join(self.cpath, i)
+            cur_stat = os.stat(cur_path)
+            inode_idx = str(cur_stat.st_ino)
+            logging.debug(i + ": " + str(cur_stat.st_mtime))
+            if os.path.isdir(cur_path):
+                cur_path_tw = TreeWalker(self.basedir, self.lib, os.path.join(self.path, i),
+                                         self.exclude, self.cached)
+                self.centries.update(cur_path_tw.parse())
             elif i.lower().endswith(('.vhd', '.vhdl')):
                 try:
-                    if (self.cached[curInodeStr]['path'] == curPath and
-                        self.cached[curInodeStr]['mtime'] == curStat.st_mtime):
-                        self.curEntries[curInodeStr] = self.cached[curInodeStr]
-                        self.curEntries[curInodeStr]['modified'] = False
+                    if (self.cached[inode_idx]['path'] == cur_path and
+                            self.cached[inode_idx]['mtime'] == cur_stat.st_mtime):
+                        self.centries[inode_idx] = self.cached[inode_idx]
+                        self.centries[inode_idx]['modified'] = False
                     else:
-                        print ('raise E')
                         raise Exception
-                except:
+                except (KeyError, TypeError):
                     logging.debug('VHDL file parsing: ' + i)
-                    f = VhdlFileHandler(self.curPath, i, self.lib)
-                    f.parse()
-                    self.curEntries.update({str(curStat.st_ino) : f.getInfo()})
+                    vhdl_inst = VhdlFileHandler(self.cpath, i, self.lib)
+                    vhdl_inst.parse()
+                    self.centries.update({str(cur_stat.st_ino) : vhdl_inst.getInfo()})
             elif i.lower().endswith(('.sv')):
                 try:
-                    if (self.cached[curInodeStr]['path'] == curPath and
-                        self.cached[curInodeStr]['mtime'] == curStat.st_mtime):
-                        self.curEntries[curInodeStr] = self.cached[curInodeStr]
-                        self.curEntries[curInodeStr]['modified'] = False
+                    if (self.cached[inode_idx]['path'] == cur_path and
+                            self.cached[inode_idx]['mtime'] == cur_stat.st_mtime):
+                        self.centries[inode_idx] = self.cached[inode_idx]
+                        self.centries[inode_idx]['modified'] = False
                     else:
-                        print ('raise E')
                         raise Exception
-                except:
+                except (KeyError, TypeError):
                     logging.debug('SystemVerilog file parsing: ' + i)
-                    f = SvFileHandler(self.curPath, i, self.lib)
-                    f.parse()
-                    self.curEntries.update({str(curStat.st_ino) : f.getInfo()})
-                
+                    svinst = SvFileHandler(self.cpath, i, self.lib)
+                    svinst.parse()
+                    self.centries.update({str(cur_stat.st_ino) : svinst.getInfo()})
+
 
     def parse(self):
         try:
             self.exclude.index(self.path)
             return []
-        except:
+        except ValueError:
             pass
-        
-        self._parseCurPath()
-        return self._returnValues()
+
+        self._parse_current_path()
+        return self._return_values()

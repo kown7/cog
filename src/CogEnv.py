@@ -1,38 +1,50 @@
-import configparser
-import pdb
+'''
+Cog Environment
+'''
+import sys
 
 from .CogConfiguration import CogConfiguration
-from .cog import cog
+from .Cog import Cog
 from .modelsimCompiler import modelsimCompiler
 
 
 class CogEnv(object):
+    '''
+    Setting up the Cog environment
+      parse command-line and conf.ini file.
+    '''
     def __init__(self):
-        try:  sys.argv.index('-f')
-        except: self.forceCompile = False
-        else: self.forceCompile = True
-        
-        try:  sys.argv.index('--debug')
-        except: debugInfo = False
-        else: debugInfo = True
-        
+        try:
+            sys.argv.index('-f')
+        except ValueError:
+            self.force_compile = False
+        else:
+            self.force_compile = True
+
+        try:
+            sys.argv.index('--debug')
+        except ValueError:
+            debug_info = False
+        else:
+            debug_info = True
+
         self.cfg = CogConfiguration()
 
-        self.f = cog( top = self.cfg.TB_FILE, debug = debugInfo )
+        self.coginst = Cog(top=self.cfg.TB_FILE, debug=debug_info)
         for i in self.cfg.BASEDIR:
-            self.f.addLib(i, 'work')
+            self.coginst.addLib(i, 'work')
 
         # Compiler factory
         if self.cfg.MODELSIM:
-            self.f.comp = modelsimCompiler(self.cfg.MODELSIM)
-            
-        self.f.comp.compileOptions = self.cfg.COMPILE_OPTIONS
+            self.coginst.comp = modelsimCompiler(self.cfg.MODELSIM)
 
-    def compileAll(self):
-        self.f.compileAll(self.forceCompile)
+        self.coginst.comp.compileOptions = self.cfg.COMPILE_OPTIONS
 
-    def runSimulationGui(self):
-        self.f.comp.runSimulationGui(self.cfg.TB_ENTITY, self.cfg.SIM_OPTIONS)
+    def compile_all(self):
+        self.coginst.compileAll(self.force_compile)
 
-    def runSimulation(self):
-        self.f.comp.runSimulation(self.cfg.TB_ENTITY, self.cfg.SIM_OPTIONS)
+    def run_simulation_gui(self):
+        self.coginst.comp.runSimulationGui(self.cfg.TB_ENTITY, self.cfg.SIM_OPTIONS)
+
+    def run_simulation(self):
+        self.coginst.comp.runSimulation(self.cfg.TB_ENTITY, self.cfg.SIM_OPTIONS)

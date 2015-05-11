@@ -2,4 +2,4 @@
 from cog import CogEnv
 
 ce = CogEnv()
-ce.compileAll()
+ce.compile_all()

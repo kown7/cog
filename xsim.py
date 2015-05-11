@@ -2,8 +2,8 @@
 from cog import CogEnv
 
 ce = CogEnv()
-ce.compileAll()
-ce.runSimulationGui()
+ce.compile_all()
+ce.run_simulation_gui()
 
 
 

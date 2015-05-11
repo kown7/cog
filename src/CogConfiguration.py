@@ -1,5 +1,4 @@
 import configparser
-import pdb
 
 
 class CogConfiguration(object):
@@ -7,12 +6,40 @@ class CogConfiguration(object):
         config = configparser.ConfigParser()
         config.read('conf.ini')
 
-        self.TB_ENTITY = config.get('General', 'TB_ENTITY')
-        self.COMPILE_OPTIONS = [x.strip() for x in config.get('General', 'COMPILE_OPTIONS').split(',')]
-        self.SIM_OPTIONS = [x.strip() for x in config.get('General', 'SIM_OPTIONS').split(',')]
-        self.BASEDIR = [x.strip() for x in config.get('Files', 'BASEDIR').split(',')]
-        self.TB_FILE = config.get('Files', 'TB_FILE')
-        
+        self._tb_entity = config.get('General', 'TB_ENTITY')
+        self._compile_options = [x.strip()
+                                 for x in config.get('General', 'COMPILE_OPTIONS').split(',')]
+        self._sim_options = [x.strip()
+                             for x in config.get('General', 'SIM_OPTIONS').split(',')]
+        self._basedir = [x.strip() for x in config.get('Files', 'BASEDIR').split(',')]
+        self._tb_file = config.get('Files', 'TB_FILE')
+
         # Implementation specifics
-        try: self.MODELSIM = config.get('Files', 'MODELSIM')
-        except: self.MODELSIM = None
+        try:
+            self._modelsim = config.get('Files', 'MODELSIM')
+        except (NoOptionError, NoSectionError):
+            self._modelsim = None
+
+    @property
+    def TB_ENTITY(self):
+        return self._tb_entity
+
+    @property
+    def COMPILE_OPTIONS(self):
+        return self._compile_options
+
+    @property
+    def SIM_OPTIONS(self):
+        return self._sim_options
+
+    @property
+    def BASEDIR(self):
+        return self._basedir
+
+    @property
+    def TB_FILE(self):
+        return self._tb_file
+
+    @property 
+    def MODELSIM(self):
+        return self._modelsim

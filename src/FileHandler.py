@@ -1,7 +1,7 @@
 import os
 import logging
 
-from .CogFileType import *
+from .CogFileType import CogFileType
 
 
 class FileHandler(object):
@@ -9,7 +9,7 @@ class FileHandler(object):
         self.path = path
         self.filename = filename
         self.lib = lib
-        self.filePath = path + '/' + filename
+        self.filePath = os.path.join(path, filename)
 
         self.objectName = None
         self.objectType = CogFileType.Undefined
@@ -27,13 +27,13 @@ class FileHandler(object):
     def _setChangeTime(self):
         stats = os.stat(self.filePath)
         self.st_mtime = stats.st_mtime
-        
+
     def _setCompileTime(self):
         pass
 
     def getInfo(self):
-        # ctime : compile time 
-        return { 'path' : self.filePath, 'objName' : self.objectName,
-                 'lib' : self.library, 'deps' : self.dependsOnObject,
-                 'modified' : self.modified, 'mtime' : self.st_mtime,
-                 'ctime' : self.compileTime, 'type' : self.objectType }
+        # ctime : compile time
+        return {'path' : self.filePath, 'objName' : self.objectName,
+                'lib' : self.library, 'deps' : self.dependsOnObject,
+                'modified' : self.modified, 'mtime' : self.st_mtime,
+                'ctime' : self.compileTime, 'type' : self.objectType}

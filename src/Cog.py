@@ -37,92 +37,92 @@ The debug level needs to be set with the constructor
 import logging
 import json
 import os
-import pprint
 import copy
 import pdb
 
-from .TreeWalker import *
-from .CogFileType import *
+from .TreeWalker import TreeWalker
 
 
-class cog(object):
+class Cog(object):
     def __init__(self, **kwargs):
         self.libs = []
-        if kwargs.get('basedir') :
+        if kwargs.get('basedir'):
             self.libs.append({'basedir' : kwargs.get('basedir', os.path.expanduser('~')),
-            'lib' : kwargs.get('lib', 'work'),
-            ## Directories not to be parsed; relative path to basedir
-            'exclude' : kwargs.get('exclude', [])})
+                              'lib' : kwargs.get('lib', 'work'),
+                              ## Directories not to be parsed; relative path to basedir
+                              'exclude' : kwargs.get('exclude', [])})
         # File path needs to absolute
-        self.topFile = os.path.abspath(kwargs.get('top', ''))
+        self.top_file = os.path.abspath(kwargs.get('top', ''))
         # Should not be None, as it may trigger weird behaviour
-        self.ignoreLibs = kwargs.get('ignoreLibs', [])
+        self.ignore_libs = kwargs.get('ignoreLibs', [])
         self.debug = kwargs.get('debug', False)
         # col : compile order list
         self.col = []
         # Assign compiler object to have runAll fun.
-        self.comp = None 
+        self.comp = None
 
         self._cache = None
-        self._parsedTree = {}
-        self._cacheFile = os.path.expanduser('~') + '/.cog.py.stash'
+        self._parsed_tree = {}
+        self._cache_file = os.path.expanduser('~') + '/.cog.py.stash'
 
         if self.debug:
             logging.basicConfig(level=logging.DEBUG)
 
-        #assert self.ignoreLibs != None , 'ignoreLibs may not be None'
+        #assert self.ignore_libs != None , 'ignoreLibs may not be None'
 
-    def addLib(self, bdir, lib, exclude = []):
+    def addLib(self, bdir, lib, exclude=None):
+        if not exclude:
+            exclude = []
         self.libs.append({'basedir' : bdir, 'lib' : lib, 'exclude' : exclude})
 
     def parse(self):
         for lib in self.libs:
             tw = TreeWalker(lib['basedir'], lib['lib'], '', lib['exclude'], self._cache)
-            self._parsedTree.update(tw.parse())
+            self._parsed_tree.update(tw.parse())
 
 
     def genTreeAll(self):
-        self.col = self._generateDependencyTree(self._parsedTree)
+        self.col = self._generateDependencyTree(self._parsed_tree)
 
 
     def genTreeFile(self, *args):
         if len(args) > 0:
-            self.topFile = os.path.abspath(args[0])
-        if os.path.isfile(self.topFile):
+            self.top_file = os.path.abspath(args[0])
+        if os.path.isfile(self.top_file):
             self.col = self._generateDependencyFile()
         else:
-            logging.error('File does not exist: ' + self.topFile)
+            logging.error('File does not exist: ' + self.top_file)
 
 
     def loadCache(self):
         try:
-            with open(self._cacheFile, 'r') as fp:
+            with open(self._cache_file, 'r') as fp:
                 self._cache = json.load(fp)
-        except:
+        except IOError:
             self._cache = None
             logging.warning('Could not open cache file')
 
 
     def importCompileTimes(self, designs):
-        if not self._parsedTree:
+        if not self._parsed_tree:
             raise Exception
         for inode in designs:
-            if self._parsedTree[inode]:
+            if self._parsed_tree[inode]:
                 try:
-                    self._parsedTree[inode].update({'ctime' : designs[inode]['ctime']})
-                except:
+                    self._parsed_tree[inode].update({'ctime' : designs[inode]['ctime']})
+                except KeyError:
                     logging.warning('No ctime found for ' + designs[inode]['name'])
 
 
     def saveCache(self):
-        with open(self._cacheFile, 'w') as f:
+        with open(self._cache_file, 'w') as f:
             f.write(json.dumps(self._cache))
 
     def printCsv(self):
         for obj in self.col:
             print(obj[0] + ',' + obj[1])
 
-    def compileAll(self, forceCompile = False):
+    def compileAll(self, forceCompile=False):
         self.loadCache()
         self.parse()
         if not forceCompile:
@@ -169,9 +169,9 @@ class cog(object):
     def _isInCol(self, deps, col, parsedTree):
         for dep in deps:
             try:
-                self.ignoreLibs.index(dep[0])
+                self.ignore_libs.index(dep[0])
                 continue # next element
-            except:
+            except ValueError:
                 pass
 
             try:
@@ -181,7 +181,7 @@ class cog(object):
                     col.index(['work', dep[1]])
                 else:
                     col.index(dep)
-            except:
+            except ValueError:
                 if dep[0] == None and self._isInTree(dep[1], parsedTree) == False:
                     pass
                 else:
@@ -193,20 +193,20 @@ class cog(object):
         for key in parsedTree:
             if parsedTree[key]['objName'].lower() == entity:
                 if parsedTree[key]['lib'].lower() != 'work':
-                    loggin.warning('Object ' + entity + ' found in library ' + parsedTree[key]['lib'])
+                    logging.warning('Object ' + entity + ' found in library ' + parsedTree[key]['lib'])
                 return True
         return False
 
 
 
     def _generateDependencyFile(self):
-        absFilename = os.path.abspath(self.topFile)
+        absFilename = os.path.abspath(self.top_file)
         parsedTreeSubset = {}
 
         reqFiles = self._sampleReqFiles(absFilename)
 
         for i in reqFiles:
-            parsedTreeSubset[i] = self._parsedTree[i]
+            parsedTreeSubset[i] = self._parsed_tree[i]
 
         return self._generateDependencyTree(parsedTreeSubset)
 
@@ -217,13 +217,13 @@ class cog(object):
         curInodeStr = str(curStat.st_ino)
         reqFiles = [curInodeStr]
 
-        for dep in self._parsedTree[curInodeStr]['deps']:
+        for dep in self._parsed_tree[curInodeStr]['deps']:
             if len(dep) > 0:
                 ret = self._callSampleReqFilesByObjName(dep)
                 for i in ret:
                     try:
                         reqFiles.index(i)
-                    except:
+                    except KeyError:
                         reqFiles.append(i)
 
         return reqFiles
@@ -231,9 +231,9 @@ class cog(object):
 
 
     def _callSampleReqFilesByObjName(self, dep):
-        for key in self._parsedTree:
-            if ((self._parsedTree[key]['lib'].lower() == dep[0] or dep[0] == None)
-                and self._parsedTree[key]['objName'].lower() == dep[1]):
-                return self._sampleReqFiles(self._parsedTree[key]['path'])
+        for key in self._parsed_tree:
+            if ((self._parsed_tree[key]['lib'].lower() == dep[0] or dep[0] == None) and
+                    self._parsed_tree[key]['objName'].lower() == dep[1]):
+                return self._sampleReqFiles(self._parsed_tree[key]['path'])
         logging.warning('Not found ' + str(dep))
         return []
