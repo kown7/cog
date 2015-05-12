@@ -1,7 +1,7 @@
 import unittest
 import os
-from ..src import VhdlFileHandler
-from ..src import CogFileType
+from src import VhdlFileHandler
+from src import CogFileType
 
 class VhdlFileHandlerUnittest(unittest.TestCase):
 
@@ -32,7 +32,7 @@ class VhdlFileHandlerUnittest(unittest.TestCase):
         self.assertEqual(actResp['lib'], expResp['lib'])
         self.assertEqual(actResp['deps'], expResp['deps'])
         self.assertEqual(actResp['type'], expResp['type'])
-    
+
         
 if __name__ == '__main__':
     unittest.main()
