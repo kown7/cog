@@ -47,6 +47,9 @@ class CogEnv(object):
     def compile_all(self):
         self.coginst.compileAll(self.force_compile)
 
+    def compile_file(self):
+        self.coginst.compile_file(self.force_compile)
+
     def run_simulation_gui(self):
         self.coginst.comp.runSimulationGui(self.cfg.TB_ENTITY, self.cfg.SIM_OPTIONS)
 

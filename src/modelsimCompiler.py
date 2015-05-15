@@ -129,7 +129,11 @@ class modelsimCompiler(cogCompilerInterface):
 
 
     def runSimulation(self, dutName, simOpts = []):
-        simOpts += ['-batch', '-do', 'run.do']
+        simOpts+= ['-batch']
+        try:
+            simOpts.index('-do')
+        except ValueError:
+            simOpts += ['-do', 'run.do']
         return self._runSim(dutName, simOpts)
         
     def runSimulationGui(self, dutName, simOpts = []):

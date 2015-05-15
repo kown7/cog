@@ -39,6 +39,7 @@ import json
 import os
 import copy
 import pdb
+import pprint
 
 from .TreeWalker import TreeWalker
 
@@ -130,6 +131,17 @@ class Cog(object):
         self.genTreeAll()
         self.comp.compileAllFiles(self.col)
         self.saveCache()
+
+
+    def compile_file(self, force_compile=False):
+        self.loadCache()
+        self.parse()
+        if not force_compile:
+            self.importCompileTimes(self.comp.getLibsContent(self.libs))
+        self.genTreeFile()
+        self.comp.compileAllFiles(self.col)
+        self.saveCache()        
+
 
 
     def _generateDependencyTree(self, parsedTreeInp):
@@ -232,6 +244,8 @@ class Cog(object):
 
     def _callSampleReqFilesByObjName(self, dep):
         for key in self._parsed_tree:
+            if not self._parsed_tree[key]['objName']:
+                continue # No name in file.
             if ((self._parsed_tree[key]['lib'].lower() == dep[0] or dep[0] == None) and
                     self._parsed_tree[key]['objName'].lower() == dep[1]):
                 return self._sampleReqFiles(self._parsed_tree[key]['path'])
