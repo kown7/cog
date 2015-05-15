@@ -1,5 +1,5 @@
 '''cog.py
-Copyright (c) Kristoffer Nordström, All rights reserved.
+Copyright (c) Kristoffer Nordstroem, All rights reserved.
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -63,7 +63,7 @@ class Cog(object):
 
         self._cache = None
         self._parsed_tree = {}
-        self._cache_file = os.path.expanduser('~') + '/.cog.py.stash'
+        self._cache_file = os.path.join(os.path.expanduser('~'), '.cog.py.stash')
 
         if self.debug:
             logging.basicConfig(level=logging.DEBUG)
@@ -223,7 +223,7 @@ class Cog(object):
                 for i in ret:
                     try:
                         reqFiles.index(i)
-                    except KeyError:
+                    except ValueError:
                         reqFiles.append(i)
 
         return reqFiles

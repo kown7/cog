@@ -24,13 +24,17 @@ class CogEnv(object):
         try:
             sys.argv.index('--debug')
         except ValueError:
-            debug_info = False
+            self._debug_info = False
         else:
-            debug_info = True
+            self._debug_info = True
 
         self.cfg = CogConfiguration()
+        if self.cfg.TB_ENTITY:
+            self.factory()
+        
 
-        self.coginst = Cog(top=self.cfg.TB_FILE, debug=debug_info)
+    def factory(self):
+        self.coginst = Cog(top=self.cfg.TB_FILE, debug=self._debug_info)
         for i in self.cfg.BASEDIR:
             self.coginst.addLib(i, 'work')
 

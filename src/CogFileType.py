@@ -1,5 +1,5 @@
 ''' CogFileType.py
-Copyright (c) Kristoffer Nordström, All rights reserved.
+Copyright (c) Kristoffer Nordstroem, All rights reserved.
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
