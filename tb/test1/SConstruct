@@ -1,0 +1,52 @@
+import pdb
+from cog.src import modelsimCompiler
+
+#def modelsim_builder(target, source, env):
+#    mc = modelsimCompiler('E:\\modeltech_pe_10.4a\\win32pe\\')
+#    params = []
+#    for j in source:
+#        filename = j.rstr()
+#        suffix = filename.split('.')[-1]
+#        if suffix == 'sv':
+#            suffix_id = 3
+#        elif suffix == 'vhdl':
+#            suffix_id = 1
+#        else:
+#            raise Error('Wrong suffix')
+#    	params.append(['work', filename, suffix_id])
+#    mc.compileAllFiles(params)
+#    return None
+#    # mc raises errors if it fails.
+#
+#bld = Builder(action = modelsim_builder,
+#              suffix = '.log',
+#              src_suffix = ['.vhd', '.vhdl', '.sv'])
+#
+#Glob('../../src/*')
+#
+#env = Environment(BUILDERS = {'builder' : bld})
+
+#env.builder('tb_test1.sv')
+
+##########################################################################
+# Testing integrated setup
+# Very nice indeed
+##########################################################################
+
+import logging
+logging.basicConfig(level=11)
+
+env2 = Environment(
+    tools = ['default', 'cogpy'],
+    TB_ENTITY = 'tb_test1',
+    COMPILE_OPTIONS = ['+cover=sbceft'],
+    SIM_OPTIONS = ['-coverage', '-msgmode', 'both', '-displaymsgmode', 'both'],
+    MODELSIM = 'E:\\modeltech_pe_10.4a\\win32pe',
+    BASEDIR = ['C:\\Users\\kn\\Documents\\workspace\\test1\\tb\\test1\\','C:\\Users\\kn\\Documents\\workspace\\test1\\src'],
+    TB_FILE = 'C:\\Users\\kn\\Documents\\workspace\\test1\\tb\\test1\\tb_test1.sv'
+)
+
+#env2.cogpy_builder(None, 'C:\\Users\\kn\\Documents\\workspace\\test1\\tb\\test1\\tb_test1.sv')
+
+Default(env2.cogpy_builder('tb_test1.sv'))
+Default(env2.cogpy_sim('sim/run.do'))
