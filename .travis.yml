@@ -8,3 +8,7 @@ install:
 #script: python -m unittest discover
 script:
   - tox
+
+notifications:
+  email:
+    - k.nordstroem@helveting.ch
