@@ -145,6 +145,10 @@ class Cog(object):
 
 
     def _generateDependencyTree(self, parsedTreeInp):
+        '''TODO: In order to prevent dependecies to be broken, we'd need to
+        walk through the entire tree from both directions.
+
+        '''
         ABORT_LIMIT = 10000
         iterCount = 0
         parsedTree = copy.copy(parsedTreeInp)
@@ -167,7 +171,12 @@ class Cog(object):
                     colFp.append([parsedTree[key]['lib'], parsedTree[key]['path'], parsedTree[key]['type']])
                     del parsedTree[key]
                     break
-
+                elif self._isInCol(parsedTree[key]['deps'], col+colIgnore, parsedTree):
+                    col.append([parsedTree[key]['lib'], parsedTree[key]['objName']])
+                    colFp.append([parsedTree[key]['lib'], parsedTree[key]['path'], parsedTree[key]['type']])
+                    del parsedTree[key]
+                    break
+                    
             if iterCount == ABORT_LIMIT:
                 pdb.set_trace()
                 raise Exception

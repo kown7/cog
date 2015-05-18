@@ -37,7 +37,7 @@ class modelsimCompiler(cogCompilerInterface):
     simulationOptions  = []
     
         
-    def getLibsContent(self, libs = ['work']):
+    def getLibsContent(self, libs):
         entities = {}
         if not self._modelsimDir:
             raise Exception('Modelsim directory not specified.')
@@ -105,10 +105,10 @@ class modelsimCompiler(cogCompilerInterface):
         return lenv
 
 
-    def compileAllFiles(self, compileOrderList):
+    def compileAllFiles(self, compile_order_list):
         lenv=self._modelsimCompensateOffset()
 
-        for fp in compileOrderList:
+        for fp in compile_order_list:
                 if fp[2] == CogFileType.VhdlEntity or fp[2] == CogFileType.VhdlPackage:
                     compiler = self.VCOM
                 elif fp[2] == CogFileType.SvModule:
@@ -128,22 +128,22 @@ class modelsimCompiler(cogCompilerInterface):
                         raise SystemExit
 
 
-    def runSimulation(self, dutName, simOpts = []):
-        simOpts+= ['-batch']
+    def runSimulation(self, dut_name, sim_options = []):
+        sim_options+= ['-batch']
         try:
-            simOpts.index('-do')
+            sim_options.index('-do')
         except ValueError:
-            simOpts += ['-do', 'run.do']
-        return self._runSim(dutName, simOpts)
+            sim_options += ['-do', 'run.do']
+        return self._runSim(dut_name, sim_options)
         
-    def runSimulationGui(self, dutName, simOpts = []):
-        simOpts += ['-gui', '-onfinish', 'stop', '-do', 'wave.do']
-        return self._runSim(dutName, simOpts)
+    def runSimulationGui(self, dut_name, sim_options = []):
+        sim_options += ['-gui', '-onfinish', 'stop', '-do', 'wave.do']
+        return self._runSim(dut_name, sim_options)
 
-    def _runSim(self, dutName, simOpts):
-        if simOpts:
-            self.simulationOptions += simOpts;
-        return call([self.VSIM]+self.simulationOptions+[dutName])
+    def _runSim(self, dut_name, sim_options):
+        if sim_options:
+            self.simulationOptions += sim_options;
+        return call([self.VSIM]+self.simulationOptions+[dut_name])
     
 
 
