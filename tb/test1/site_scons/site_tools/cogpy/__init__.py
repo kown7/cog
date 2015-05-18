@@ -27,18 +27,9 @@ import SCons.Builder
 import SCons.Util
 
 import pdb
-import pprint
 import subprocess
 import os
 from cog import CogEnv
-
-class ToolJalWarning(SCons.Warnings.Warning):
-    pass
-
-class JalCompilerNotFound(ToolJalWarning):
-    pass
-
-SCons.Warnings.enableWarningClass(ToolJalWarning)
 
 
 def _cog_py_builder(target, source, env):
