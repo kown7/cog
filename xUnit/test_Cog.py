@@ -1,6 +1,7 @@
 import unittest
 import os
 import pprint
+import time
 
 from src import Cog
 from src import Testbench_Compiler
@@ -65,6 +66,7 @@ class CogUnittest(unittest.TestCase):
 
 
     def test_compile_all_and_run_again_with_B_changed(self):
+        time.sleep(1) # Timestamps may be only 1s resolution.
         expResp = ['Cents.vhd', 'B.vhd', 'A.vhd']
         self.coginst_two.comp = Testbench_Compiler.Testbench_Compiler()
         self.coginst_two.compile_file(force_compile=True)
@@ -74,8 +76,8 @@ class CogUnittest(unittest.TestCase):
         self.assertEqual(expResp, actResp)
 
         # Modify B.vhd
+        time.sleep(1) # Timestamps may be only 1s resolution.
         os.utime(self.coginst_two.col[1][1])
-        #print(self.coginst_two.col[1][1])
 
         self.coginst_two.compile_file()
         expResp = ['B.vhd', 'A.vhd']
