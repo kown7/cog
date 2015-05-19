@@ -2,7 +2,7 @@
 from cog import CogEnv
 
 ce = CogEnv()
-ce.compile_all()
+ce.compile_file()
 rV = ce.run_simulation()
 
 if rV: # Exit zero is good

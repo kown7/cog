@@ -19,7 +19,7 @@ class modelsimCompiler(cogCompilerInterface):
     def __init__(self, path = None):
         if path:
             self.modelsimDir = path
-    
+
     @property
     def modelsimDir(self):
         return self._modelsimDir
@@ -32,11 +32,11 @@ class modelsimCompiler(cogCompilerInterface):
         self.VSIM = os.path.join(self._modelsimDir, 'vsim.exe')
         self.VDIR = os.path.join(self._modelsimDir, 'vdir.exe')
     _modelsimDir = None
-    
+
     compileOptions = []
     simulationOptions  = []
-    
-        
+
+
     def getLibsContent(self, libs):
         entities = {}
         if not self._modelsimDir:
@@ -44,14 +44,14 @@ class modelsimCompiler(cogCompilerInterface):
         for lib in libs:
             entities.update(self._getLibParsed(lib['lib']))
         return entities
- 
-    
+
+
     def _getLibParsed(self, curLib):
         lenv=self._modelsimCompensateOffset()
         if not os.path.isdir(curLib):
             try: call([self.VLIB, curLib])
             except: raise SystemExit
-            
+
         try:
             libContent = check_output([self.VDIR, '-l', '-lib', curLib], env=lenv)
         except:
@@ -86,7 +86,7 @@ class modelsimCompiler(cogCompilerInterface):
                 allEnt.update({inode : curEnt})
         return allEnt
 
-    
+
     def _modelsimCompensateOffset(self):
         lenv = os.environ.copy()
         if sys.platform.startswith('cygwin'):
@@ -129,13 +129,13 @@ class modelsimCompiler(cogCompilerInterface):
 
 
     def runSimulation(self, dut_name, sim_options = []):
-        sim_options+= ['-batch']
+        sim_options+= ['-batch', '-onfinish', 'exit']
         try:
             sim_options.index('-do')
         except ValueError:
             sim_options += ['-do', 'run.do']
         return self._runSim(dut_name, sim_options)
-        
+
     def runSimulationGui(self, dut_name, sim_options = []):
         sim_options += ['-gui', '-onfinish', 'stop', '-do', 'wave.do']
         return self._runSim(dut_name, sim_options)
@@ -144,7 +144,7 @@ class modelsimCompiler(cogCompilerInterface):
         if sim_options:
             self.simulationOptions += sim_options;
         return call([self.VSIM]+self.simulationOptions+[dut_name])
-    
+
 
 
 class bcolors:
