@@ -50,9 +50,10 @@ def _cog_py_sim(target, source, env):
     do_file_complete = map(str, source)[0]
     do_file = do_file_complete.split(os.path.sep)[-1]
     env['COG_INST'].cfg._sim_options += ['-do', do_file]
-    env['COG_INST'].run_simulation()
+    return_value = env['COG_INST'].run_simulation()
     # There is no parsing of the simulation output.
-    return None
+    # Using subprocess.call return value for now.
+    return return_value
 
 
 _cogpy_action_sim = SCons.Builder.Builder(
