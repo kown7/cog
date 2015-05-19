@@ -38,6 +38,7 @@ env = Environment(
 
 simrun = env.cogpy_sim('run.do')
 tb = env.cogpy_builder('tb_test2.sv')
+env.Clean('tb_test2.sv', 'work')
 
 Default(tb)
 #Default(simrun)
