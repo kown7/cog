@@ -136,14 +136,47 @@ class modelsimCompiler(cogCompilerInterface):
             sim_options += ['-do', 'run.do']
         return self._runSim(dut_name, sim_options)
 
+
     def runSimulationGui(self, dut_name, sim_options = []):
         sim_options += ['-gui', '-onfinish', 'stop', '-do', 'wave.do']
         return self._runSim(dut_name, sim_options)
 
+
     def _runSim(self, dut_name, sim_options):
         if sim_options:
             self.simulationOptions += sim_options;
-        return call([self.VSIM]+self.simulationOptions+[dut_name])
+        try:
+            output = check_output([self.VSIM]+self.simulationOptions+[dut_name])
+        except CalledProcessError as err:
+            output = err.output
+            return err.returncode # Non-zero
+
+        errors = 0
+        warnings = 0
+        notes = 0
+        print_next = False
+        out_split = output.split('\n')
+        for line in out_split:
+            if print_next:
+                print(line)
+                print_next = False
+            if re.search('\*\* Failure:', line):
+                print(line)
+                return -42
+            if re.search('\*\* Error:', line):
+                print(line)
+                print_next = True
+                errors += 1
+            if re.search('\*\* Warning:', line):
+                print(line)
+                print_next = True
+                warnings += 1
+            if re.search('\*\* Note:', line):
+                print(line)
+                notes += 1
+
+        return errors + warnings
+
 
 
 
