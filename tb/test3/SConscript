@@ -1,0 +1,43 @@
+'''Testing integrated setup
+
+Copyright (c) 2015 K. Nordstroem <k.nordstroem@helveting.ch>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+'''
+import logging
+import os
+
+DS = os.path.sep
+
+env = Environment(
+    tools=['default', 'cogpy'],
+    TB_ENTITY='tb_test3',
+    COMPILE_OPTIONS=['+cover=sbceft'],
+    SIM_OPTIONS=['-coverage', '-msgmode', 'both', '-displaymsgmode', 'both'],
+    MODELSIM='E:\\modeltech_pe_10.4a\\win32pe',
+    BASEDIR=[os.path.abspath('.'), os.path.abspath('..'+DS+'..'+DS+'..'+DS+'src')],
+    TB_FILE='tb_test3.sv'
+)
+
+simrun = env.cogpy_sim('run.do')
+tb = env.cogpy_builder('tb_test3.sv')
+
+Default(tb)
+#Default(simrun)
