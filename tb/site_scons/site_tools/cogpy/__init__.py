@@ -35,34 +35,34 @@ from cog import CogEnv
 #
 # Emitters
 #
-#def _cog_py_emitter(target, source, env):
-#    libs_added = []
-#    for i in env['COG_INST'].coginst.libs:
-#        try:
-#            libs_added.index(i['lib'])
-#        except ValueError:
-#            temp = env.fs.Dir(i['lib'])
-#            target.append(temp)
-#            #target.append(i['lib'])
-#            libs_added.append(i['lib'])
-#            
-#    return target, source
+def _cog_py_emitter(target, source, env):
+    libs_added = []
+    for i in env['COG_INST'].coginst.libs:
+        try:
+            libs_added.index(i['lib'])
+        except ValueError:
+            temp = env.fs.Dir(i['lib'])
+            target.append(temp)
+            #target.append(i['lib'])
+            libs_added.append(i['lib'])
+
+    return target, source
 
 
 def _cog_py_builder(target, source, env):
     env['COG_INST'].compile_file()
     return None
 
-    
+
 _cogpy_action_builder = SCons.Builder.Builder(
     action = _cog_py_builder,
     suffix = '',
     src_suffix = ['.sv', '.vhdl'],
-    #emitter = _cog_py_emitter,
+    emitter = _cog_py_emitter,
     chdir = 1
 )
 
-     
+
 def _cog_py_sim(target, source, env):
     do_file_complete = map(str, source)[0]
     do_file = do_file_complete.split(os.path.sep)[-1]
@@ -71,7 +71,7 @@ def _cog_py_sim(target, source, env):
     # There is no parsing of the simulation output.
     return None
 
-    
+
 _cogpy_action_sim = SCons.Builder.Builder(
     action = _cog_py_sim,
     suffix = '',

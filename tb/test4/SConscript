@@ -1,4 +1,4 @@
-'''Testing many tests
+'''Testing integrated setup
 
 Copyright (c) 2015 K. Nordstroem <k.nordstroem@helveting.ch>
 
@@ -20,30 +20,24 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-
-Run the new thing with, e.g.,
-
-$ scons build/test2/sim/run
-
 '''
 import logging
 import os
 
-BUILD_DIR = 'build'
-def tests():
-    yield 'test2'
-    yield 'test3'
-    yield 'test4'
+DS = os.path.sep
 
-env = Environment()
+env = Environment(
+    tools=['default', 'cogpy'],
+    TB_ENTITY='tb_test4',
+    COMPILE_OPTIONS=['+cover=sbceft'],
+    SIM_OPTIONS=['-coverage', '-msgmode', 'both', '-displaymsgmode', 'both'],
+    MODELSIM='E:\\modeltech_pe_10.4a\\win32pe',
+    BASEDIR=[os.path.abspath('.'), os.path.abspath('..'+DS+'..'+DS+'..'+DS+'src')],
+    TB_FILE='tb_test4.vhd'
+)
 
-for test in tests():
-    sconscript_path = os.path.join(test, 'SConscript')
-    assert os.path.isfile(sconscript_path)
-    print('scons: |- Reading module ' + test + '...')
-    # Execute the SConscript file, with variant_dir set to the
-    #  module dir under the project build dir.
-    targets = env.SConscript(sconscript_path,
-                             variant_dir=os.path.join(BUILD_DIR, test),
-                             duplicate=True,
-                             exports={'env': env})
+simrun = env.cogpy_sim('run.do')
+tb = env.cogpy_builder('tb_test4.vhd')
+
+Default(tb)
+#Default(simrun)

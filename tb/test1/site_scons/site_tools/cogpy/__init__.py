@@ -36,21 +36,21 @@ def _cog_py_builder(target, source, env):
     env['COG_INST'].compile_file()
     return None
 
-    
+
 _cogpy_action_builder = SCons.Builder.Builder(
         action = _cog_py_builder,
         suffix = '',
         src_suffix = ['.sv', '.vhdl']
         )
 
-     
+
 def _cog_py_sim(target, source, env):
     env['COG_INST'].cfg._sim_options += ['-do', 'sim'+os.path.sep+'run.do']
     env['COG_INST'].run_simulation()
     # There is no parsing of the simulation output.
     return None
 
-    
+
 _cogpy_action_sim = SCons.Builder.Builder(
     action = _cog_py_sim,
     suffix = '',
