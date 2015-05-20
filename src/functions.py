@@ -1,5 +1,5 @@
 import os
-import md5
+import hashlib
 
 def str_stat_inode(cur_stat):
     if cur_stat.st_ino == 0:
@@ -12,7 +12,7 @@ def str_fname_inode(filename):
     try: 
         return str_stat_inode(cur_stat)
     except Exception:
-        msum = md5.new(filename)
+        msum = hashlib.md5(filename)
         return msum.hexdigest()
 
 

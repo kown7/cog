@@ -4,7 +4,7 @@ import pprint
 import time
 
 from src import Cog
-from src import Testbench_Compiler
+from src import TestbenchCompiler
 
 ''' The test-setup looks as follows:
 
@@ -16,7 +16,6 @@ from src import Testbench_Compiler
 A depends on B and C; B depends on C only.
 '''
 class CogUnittest(unittest.TestCase):
-
     def setUp(self):
         self.debug_info = False
         #self.debug_info = True
@@ -50,7 +49,7 @@ class CogUnittest(unittest.TestCase):
 
     def test_compile_all_and_run_again_with_no_change(self):
         expResp = ['Cents.vhd', 'B.vhd', 'A.vhd']
-        self.coginst_two.comp = Testbench_Compiler.Testbench_Compiler()
+        self.coginst_two.comp = TestbenchCompiler.TestbenchCompiler()
         self.coginst_two.compile_file(force_compile=True)
         actResp = []
         for i in self.coginst_two.col:
@@ -68,7 +67,7 @@ class CogUnittest(unittest.TestCase):
     def test_compile_all_and_run_again_with_B_changed(self):
         time.sleep(1) # Timestamps may be only 1s resolution.
         expResp = ['Cents.vhd', 'B.vhd', 'A.vhd']
-        self.coginst_two.comp = Testbench_Compiler.Testbench_Compiler()
+        self.coginst_two.comp = TestbenchCompiler.TestbenchCompiler()
         self.coginst_two.compile_file(force_compile=True)
         actResp = []
         for i in self.coginst_two.col:
