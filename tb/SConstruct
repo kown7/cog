@@ -23,7 +23,7 @@ THE SOFTWARE.
 
 Run the new thing with, e.g.,
 
-$ scons build/test2/sim/run
+$ scons build/test2/run
 
 '''
 import logging
@@ -36,6 +36,9 @@ def tests():
     yield 'test4'
 
 env = Environment()
+
+MODELSIM_GLOBAL = 'E:\\modeltech_pe_10.4a\\win32pe'
+Export('MODELSIM_GLOBAL')
 
 for test in tests():
     sconscript_path = os.path.join(test, 'SConscript')

@@ -26,12 +26,15 @@ import os
 
 DS = os.path.sep
 
+Import('MODELSIM_GLOBAL')
+print(MODELSIM_GLOBAL)
+
 env = Environment(
     tools=['default', 'cogpy'],
     TB_ENTITY='tb_test2',
     COMPILE_OPTIONS=['+cover=sbceft'],
     SIM_OPTIONS=['-coverage', '-msgmode', 'both', '-displaymsgmode', 'both'],
-    MODELSIM='E:\\modeltech_pe_10.4a\\win32pe',
+    MODELSIM=MODELSIM_GLOBAL,
     BASEDIR=[os.path.abspath('.'), os.path.abspath('..'+DS+'..'+DS+'..'+DS+'src')],
     TB_FILE='tb_test2.sv'
 )
