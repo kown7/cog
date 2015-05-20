@@ -25,9 +25,7 @@ import logging
 import os
 
 DS = os.path.sep
-
 Import('MODELSIM_GLOBAL')
-print(MODELSIM_GLOBAL)
 
 env = Environment(
     tools=['default', 'cogpy'],
