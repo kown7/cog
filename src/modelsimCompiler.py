@@ -1,6 +1,8 @@
 from .cogCompilerInterface import *
 from .CogFileType import *
-from subprocess import call, check_output
+from .functions import *
+
+from subprocess import call, check_output, CalledProcessError
 import sys
 import pdb
 import os
@@ -79,8 +81,7 @@ class modelsimCompiler(cogCompilerInterface):
                 m = re.search('\s+Source file: (.+)', line)
                 if m != None:
                         curEnt.update({'path' : m.group(1)})
-                        curStat = os.stat(m.group(1))
-                        inode = str(curStat.st_ino)
+                        inode = str_fname_inode(m.group(1))
 
         if len(curEnt) > 0:
                 allEnt.update({inode : curEnt})
@@ -149,6 +150,7 @@ class modelsimCompiler(cogCompilerInterface):
             output = check_output([self.VSIM]+self.simulationOptions+[dut_name])
         except CalledProcessError as err:
             output = err.output
+            logging.warning('VSIM call failed with return code: ' + str(err.returncode))
             return err.returncode # Non-zero
 
         errors = 0

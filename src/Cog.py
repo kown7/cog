@@ -42,6 +42,7 @@ import pdb
 import pprint
 
 from .TreeWalker import TreeWalker
+from .functions import *
 
 
 class Cog(object):
@@ -234,8 +235,7 @@ class Cog(object):
 
     def _sampleReqFiles(self, filename):
         absFilename = os.path.abspath(filename)
-        curStat = os.stat(absFilename)
-        curInodeStr = str(curStat.st_ino)
+        curInodeStr = str_fname_inode(absFilename)
         reqFiles = [curInodeStr]
 
         for dep in self._parsed_tree[curInodeStr]['deps']:
