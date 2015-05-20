@@ -19,20 +19,26 @@ class CogUnittest(unittest.TestCase):
     def setUp(self):
         self.debug_info = False
         #self.debug_info = True
+        
         self.PATH = os.path.join(os.path.dirname(__file__), 'vhdl')
         self.TB_FILE = os.path.join(self.PATH, 'A.vhd')
+        self.TB_PKG_FILE = os.path.join(self.PATH, 'test_order.vhd')
 
         self.coginst_one = Cog.Cog(top=self.TB_FILE, debug=self.debug_info)
         self.coginst_one.addLib(self.PATH, 'work')
 
         self.coginst_two = Cog.Cog(top=self.TB_FILE, debug=self.debug_info)
         self.coginst_two.addLib(self.PATH, 'work')
+        
+        self.coginst_pkg = Cog.Cog(top=self.TB_PKG_FILE, debug=self.debug_info)
+        self.coginst_pkg.addLib(self.PATH, 'work')
 
 
     ###def test_dummy(self):
     ###    for x in range(1000):
     ###        self.assertEqual(x, x)
 
+    
     def test_list_starting_with_A(self):
         expResp = ['Cents.vhd', 'B.vhd', 'A.vhd']
 
@@ -45,6 +51,23 @@ class CogUnittest(unittest.TestCase):
             actResp.append(i[1].split(os.sep)[-1])
 
         self.assertEqual(expResp, actResp)
+
+        
+    def test_list_with_package(self):
+        expResp = ['test_order_pkg.vhd', 'test_order.vhd']
+
+        #self.coginst_one.loadCache()
+        self.coginst_pkg.parse()
+        self.coginst_pkg.genTreeFile()
+
+        actResp = []
+        for i in self.coginst_pkg.col:
+            actResp.append(i[1].split(os.sep)[-1])
+
+        self.assertEqual(expResp, actResp)
+
+        self.coginst_pkg.comp = TestbenchCompiler.TestbenchCompiler()
+        self.coginst_pkg.compile_file(force_compile=True)
 
 
     def test_compile_all_and_run_again_with_no_change(self):

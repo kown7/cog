@@ -1,4 +1,5 @@
 import time
+import logging
 
 from .cogCompilerInterface import *
 from .functions import str_fname_inode
@@ -29,6 +30,8 @@ class TestbenchCompiler(cogCompilerInterface):
             inode = str_fname_inode(i[1])
             ctime = time.time()
             lib = i[0]
+
+            logging.debug('Entity: ' + i[1] + ' in library ' + i[0])
 
             try:
                 virtual_lib[lib].update({inode : {'ctime' : ctime}})
