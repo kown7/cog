@@ -25,13 +25,13 @@ class CogUnittest(unittest.TestCase):
         self.TB_PKG_FILE = os.path.join(self.PATH, 'test_order.vhd')
 
         self.coginst_one = Cog.Cog(top=self.TB_FILE, debug=self.debug_info)
-        self.coginst_one.addLib(self.PATH, 'work')
+        self.coginst_one.add_lib(self.PATH, 'work')
 
         self.coginst_two = Cog.Cog(top=self.TB_FILE, debug=self.debug_info)
-        self.coginst_two.addLib(self.PATH, 'work')
+        self.coginst_two.add_lib(self.PATH, 'work')
         
         self.coginst_pkg = Cog.Cog(top=self.TB_PKG_FILE, debug=self.debug_info)
-        self.coginst_pkg.addLib(self.PATH, 'work')
+        self.coginst_pkg.add_lib(self.PATH, 'work')
 
 
     ###def test_dummy(self):
@@ -42,9 +42,8 @@ class CogUnittest(unittest.TestCase):
     def test_list_starting_with_A(self):
         expResp = ['Cents.vhd', 'B.vhd', 'A.vhd']
 
-        #self.coginst_one.loadCache()
         self.coginst_one.parse()
-        self.coginst_one.genTreeFile()
+        self.coginst_one.gen_tree_file()
 
         actResp = []
         for i in self.coginst_one.col:
@@ -56,9 +55,8 @@ class CogUnittest(unittest.TestCase):
     def test_list_with_package(self):
         expResp = ['test_order_pkg.vhd', 'test_order.vhd']
 
-        #self.coginst_one.loadCache()
         self.coginst_pkg.parse()
-        self.coginst_pkg.genTreeFile()
+        self.coginst_pkg.gen_tree_file()
 
         actResp = []
         for i in self.coginst_pkg.col:

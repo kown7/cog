@@ -36,7 +36,7 @@ class CogEnv(object):
     def factory(self):
         self.coginst = Cog(top=self.cfg.TB_FILE, debug=self._debug_info)
         for i in self.cfg.BASEDIR:
-            self.coginst.addLib(i, 'work')
+            self.coginst.add_lib(i, 'work')
 
         # Compiler factory
         if self.cfg.MODELSIM:
