@@ -25,13 +25,13 @@ class CogUnittest(unittest.TestCase):
         self.TB_PKG_FILE = os.path.join(self.PATH, 'test_order.vhd')
 
         self.coginst_one = Cog.Cog(top=self.TB_FILE, debug=self.debug_info)
-        self.coginst_one.addLib(self.PATH, 'work')
+        self.coginst_one.add_lib(self.PATH, 'work')
 
         self.coginst_two = Cog.Cog(top=self.TB_FILE, debug=self.debug_info)
-        self.coginst_two.addLib(self.PATH, 'work')
+        self.coginst_two.add_lib(self.PATH, 'work')
         
         self.coginst_pkg = Cog.Cog(top=self.TB_PKG_FILE, debug=self.debug_info)
-        self.coginst_pkg.addLib(self.PATH, 'work')
+        self.coginst_pkg.add_lib(self.PATH, 'work')
 
 
     ###def test_dummy(self):
@@ -42,9 +42,8 @@ class CogUnittest(unittest.TestCase):
     def test_list_starting_with_A(self):
         expResp = ['Cents.vhd', 'B.vhd', 'A.vhd']
 
-        #self.coginst_one.loadCache()
         self.coginst_one.parse()
-        self.coginst_one.genTreeFile()
+        self.coginst_one.gen_tree()
 
         actResp = []
         for i in self.coginst_one.col:
@@ -56,9 +55,8 @@ class CogUnittest(unittest.TestCase):
     def test_list_with_package(self):
         expResp = ['test_order_pkg.vhd', 'test_order.vhd']
 
-        #self.coginst_one.loadCache()
         self.coginst_pkg.parse()
-        self.coginst_pkg.genTreeFile()
+        self.coginst_pkg.gen_tree()
 
         actResp = []
         for i in self.coginst_pkg.col:
@@ -66,20 +64,20 @@ class CogUnittest(unittest.TestCase):
 
         self.assertEqual(expResp, actResp)
 
-        self.coginst_pkg.comp = TestbenchCompiler.TestbenchCompiler()
-        self.coginst_pkg.compile_file(force_compile=True)
+        #self.coginst_pkg.comp = TestbenchCompiler.TestbenchCompiler()
+        #compile_file(coginst_pkg, force_compile=True)
 
 
     def test_compile_all_and_run_again_with_no_change(self):
         expResp = ['Cents.vhd', 'B.vhd', 'A.vhd']
         self.coginst_two.comp = TestbenchCompiler.TestbenchCompiler()
-        self.coginst_two.compile_file(force_compile=True)
+        compile_file(self.coginst_two, force_compile=True)
         actResp = []
         for i in self.coginst_two.col:
             actResp.append(i[1].split(os.sep)[-1])
         self.assertEqual(expResp, actResp)
 
-        self.coginst_two.compile_file()
+        compile_file(self.coginst_two)
         expResp = []
         actResp = []
         for i in self.coginst_two.col:
@@ -91,7 +89,9 @@ class CogUnittest(unittest.TestCase):
         time.sleep(1) # Timestamps may be only 1s resolution.
         expResp = ['Cents.vhd', 'B.vhd', 'A.vhd']
         self.coginst_two.comp = TestbenchCompiler.TestbenchCompiler()
-        self.coginst_two.compile_file(force_compile=True)
+
+        compile_file(self.coginst_two, force_compile=True)
+
         actResp = []
         for i in self.coginst_two.col:
             actResp.append(i[1].split(os.sep)[-1])
@@ -101,12 +101,22 @@ class CogUnittest(unittest.TestCase):
         time.sleep(1) # Timestamps may be only 1s resolution.
         os.utime(self.coginst_two.col[1][1])
 
-        self.coginst_two.compile_file()
+        compile_file(self.coginst_two)
         expResp = ['B.vhd', 'A.vhd']
         actResp = []
         for i in self.coginst_two.col:
             actResp.append(i[1].split(os.sep)[-1])
         self.assertEqual(expResp, actResp)
+
+
+def compile_file(coginst, force_compile=False):
+    coginst.load_cache()
+    coginst.parse()
+    if not force_compile:
+        coginst.import_compile_times(coginst.comp.getLibsContent(coginst.libs))
+    coginst.gen_tree(coginst.top_file)
+    coginst.comp.compileAllFiles(coginst.col)
+    coginst.save_cache()
 
 
 

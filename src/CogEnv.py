@@ -10,8 +10,8 @@ from .modelsimCompiler import modelsimCompiler
 
 class CogEnv(object):
     '''
-    Setting up the Cog environment
-      parse command-line and conf.ini file.
+    Setting up the Cog environment.
+    Parse command-line and conf.ini file if available.
     '''
     def __init__(self):
         try:
@@ -36,7 +36,7 @@ class CogEnv(object):
     def factory(self):
         self.coginst = Cog(top=self.cfg.TB_FILE, debug=self._debug_info)
         for i in self.cfg.BASEDIR:
-            self.coginst.addLib(i, 'work')
+            self.coginst.add_lib(i, 'work')
 
         # Compiler factory
         if self.cfg.MODELSIM:
@@ -44,12 +44,27 @@ class CogEnv(object):
 
         self.coginst.comp.compileOptions = self.cfg.COMPILE_OPTIONS
 
+        
     def compile_all(self):
-        self.coginst.compileAll(self.force_compile)
+        self.coginst.load_cache()
+        self.coginst.parse()
+        if not self.force_compile:
+            self.coginst.import_compile_times(self.coginst.comp.getLibsContent(self.coginst.libs))
+        self.coginst.gen_tree()
+        self.coginst.comp.compileAllFiles(self.coginst.col)
+        self.coginst.save_cache()
 
+        
     def compile_file(self):
-        self.coginst.compile_file(self.force_compile)
+        self.coginst.load_cache()
+        self.coginst.parse()
+        if not self.force_compile:
+            self.coginst.import_compile_times(self.coginst.comp.getLibsContent(self.coginst.libs))
+        self.coginst.gen_tree(self.coginst.top_file)
+        self.coginst.comp.compileAllFiles(self.coginst.col)
+        self.coginst.save_cache()
 
+        
     def run_simulation_gui(self):
         return self.coginst.comp.runSimulationGui(self.cfg.TB_ENTITY, self.cfg.SIM_OPTIONS)
 
