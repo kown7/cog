@@ -10,8 +10,8 @@ from .modelsimCompiler import modelsimCompiler
 
 class CogEnv(object):
     '''
-    Setting up the Cog environment
-      parse command-line and conf.ini file.
+    Setting up the Cog environment.
+    Parse command-line and conf.ini file if available.
     '''
     def __init__(self):
         try:
@@ -50,16 +50,17 @@ class CogEnv(object):
         self.coginst.parse()
         if not self.force_compile:
             self.coginst.import_compile_times(self.coginst.comp.getLibsContent(self.coginst.libs))
-        self.coginst.gen_tree_all()
+        self.coginst.gen_tree()
         self.coginst.comp.compileAllFiles(self.coginst.col)
         self.coginst.save_cache()
 
+        
     def compile_file(self):
         self.coginst.load_cache()
         self.coginst.parse()
         if not self.force_compile:
             self.coginst.import_compile_times(self.coginst.comp.getLibsContent(self.coginst.libs))
-        self.coginst.gen_tree_all()
+        self.coginst.gen_tree(self.coginst.top_file)
         self.coginst.comp.compileAllFiles(self.coginst.col)
         self.coginst.save_cache()
 

@@ -114,7 +114,7 @@ def compile_file(coginst, force_compile=False):
     coginst.parse()
     if not force_compile:
         coginst.import_compile_times(coginst.comp.getLibsContent(coginst.libs))
-    coginst.gen_tree()
+    coginst.gen_tree(coginst.top_file)
     coginst.comp.compileAllFiles(coginst.col)
     coginst.save_cache()
 

@@ -32,6 +32,8 @@ Compiler implementation need to implement the CogCompilerInterface
 class.
 
 The debug level needs to be set with the constructor
+
+col : compile-order-list
 '''
 
 import logging
@@ -86,15 +88,6 @@ class Cog(object):
             self._parsed_tree.update(walked_tree.parse())
 
 
-    def load_cache(self):
-        try:
-            with open(self._cache_file, 'r') as file_handler:
-                self._cache = json.load(file_handler)
-        except IOError:
-            self._cache = None
-            logging.warning('Could not open cache file')
-
-
     def import_compile_times(self, designs):
         if not self._parsed_tree:
             raise Exception
@@ -106,13 +99,18 @@ class Cog(object):
                     logging.warning('No ctime found for ' + designs[inode]['name'])
 
 
+    def load_cache(self):
+        try:
+            with open(self._cache_file, 'r') as file_handler:
+                self._cache = json.load(file_handler)
+        except IOError:
+            self._cache = None
+            logging.warning('Could not open cache file')
+
+
     def save_cache(self):
         with open(self._cache_file, 'w') as file_handler:
             file_handler.write(json.dumps(self._cache))
-
-    def print_csv(self):
-        for obj in self.col:
-            print(obj[0] + ',' + obj[1])
 
 
     def gen_tree(self, *args):
@@ -121,48 +119,18 @@ class Cog(object):
         self._dep_tree.ignore_libs = self.ignore_libs
         
         if len(args) > 0:
-            self.top_file = os.path.abspath(args[0])
+            self._dep_tree.top_file = os.path.abspath(args[0])
+        elif self.top_file:
+            self._dep_tree.top_file = self.top_file
+        else:
+            self._dep_tree.top_file = None
 
-        self._dep_tree.top_file = self.top_file
         self._dep_tree.gen_dep_tree()
         self.col = self._dep_tree.col
+        
 
-
-    def gen_tree_all(self):
-        temp = self.top_file
-        self.top_file = None
-        self.gen_tree()
-        self.top_file = temp
-
-    # REFACTOR AWAY THE FOLLOWING PUBLIC FUNCTIONS
-
-    #def gen_tree_file(self, *args):
-    #    logging.warning('DEPRECATED FUNCTION GEN_TREE; PLEASE DO NOT USE ANYORE')
-    #    if len(args) > 0:
-    #        self.gen_tree(args[0])
-    #    else:
-    #        self.gen_tree()
-    #    
-
-    #def compile_all(self, force_compile=False):
-    #    logging.warning('DEPRECATED FUNCTION COMPILE_ALL; PLEASE DO NOT USE ANYORE')
-    #    self.load_cache()
-    #    self.parse()
-    #    if not force_compile:
-    #        self.import_compile_times(self.comp.getLibsContent(self.libs))
-    #    self.gen_tree_all()
-    #    self.comp.compileAllFiles(self.col)
-    #    self.save_cache()
-
-
-    #def compile_file(self, force_compile=False):
-    #    logging.warning('DEPRECATED FUNCTION; PLEASE DO NOT USE ANYORE')
-    #    self.load_cache()
-    #    self.parse()
-    #    if not force_compile:
-    #        self.import_compile_times(self.comp.getLibsContent(self.libs))
-    #    self.gen_tree()
-    #    self.comp.compileAllFiles(self.col)
-    #    self.save_cache()
+    def print_csv(self):
+        for obj in self.col:
+            print(obj[0] + ',' + obj[1])
 
 
