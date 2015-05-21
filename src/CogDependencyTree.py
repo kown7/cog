@@ -1,9 +1,13 @@
 import os
 import copy
+import pdb
+import logging
 
 from .functions import str_fname_inode
 
+
 PARSE_LOOP_ABORT_LIMIT = 10000
+
 
 class CogDependencyTree(object):
     '''Generate the dependecies from a TreeWalker parsed tree.'''
@@ -12,15 +16,16 @@ class CogDependencyTree(object):
         self.parsed_tree = None
         self.top_file = None
         self.ignore_libs = []
+        self.col = None
 
-    
+
     def gen_dep_tree(self):
         assert self.parsed_tree != None
 
         if not self.top_file:
             self.col = self._generate_dependency_tree(self.parsed_tree)
         elif os.path.isfile(self.top_file):
-            self.col = self._generate_dependency_file()            
+            self.col = self._generate_dependency_file()
         else:
             raise Exception('File does not exist: ' + self.top_file)
 

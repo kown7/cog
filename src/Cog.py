@@ -39,8 +39,6 @@ col : compile-order-list
 import logging
 import json
 import os
-import copy
-import pdb
 
 from .TreeWalker import TreeWalker
 from .CogDependencyTree import CogDependencyTree
@@ -114,23 +112,21 @@ class Cog(object):
 
 
     def gen_tree(self, *args):
-        self._dep_tree = CogDependencyTree()
-        self._dep_tree.parsed_tree = self._parsed_tree
-        self._dep_tree.ignore_libs = self.ignore_libs
-        
-        if len(args) > 0:
-            self._dep_tree.top_file = os.path.abspath(args[0])
-        elif self.top_file:
-            self._dep_tree.top_file = self.top_file
-        else:
-            self._dep_tree.top_file = None
+        dep_tree = CogDependencyTree()
+        dep_tree.parsed_tree = self._parsed_tree
+        dep_tree.ignore_libs = self.ignore_libs
 
-        self._dep_tree.gen_dep_tree()
-        self.col = self._dep_tree.col
-        
+        if len(args) > 0:
+            dep_tree.top_file = os.path.abspath(args[0])
+        elif self.top_file:
+            dep_tree.top_file = self.top_file
+        else:
+            dep_tree.top_file = None
+
+        dep_tree.gen_dep_tree()
+        self.col = dep_tree.col
+
 
     def print_csv(self):
         for obj in self.col:
             print(obj[0] + ',' + obj[1])
-
-
