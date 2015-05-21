@@ -44,12 +44,26 @@ class CogEnv(object):
 
         self.coginst.comp.compileOptions = self.cfg.COMPILE_OPTIONS
 
+        
     def compile_all(self):
-        self.coginst.compileAll(self.force_compile)
+        self.coginst.load_cache()
+        self.coginst.parse()
+        if not self.force_compile:
+            self.coginst.import_compile_times(self.coginst.comp.getLibsContent(self.coginst.libs))
+        self.coginst.gen_tree_all()
+        self.coginst.comp.compileAllFiles(self.coginst.col)
+        self.coginst.save_cache()
 
     def compile_file(self):
-        self.coginst.compile_file(self.force_compile)
+        self.coginst.load_cache()
+        self.coginst.parse()
+        if not self.force_compile:
+            self.coginst.import_compile_times(self.coginst.comp.getLibsContent(self.coginst.libs))
+        self.coginst.gen_tree_all()
+        self.coginst.comp.compileAllFiles(self.coginst.col)
+        self.coginst.save_cache()
 
+        
     def run_simulation_gui(self):
         return self.coginst.comp.runSimulationGui(self.cfg.TB_ENTITY, self.cfg.SIM_OPTIONS)
 
