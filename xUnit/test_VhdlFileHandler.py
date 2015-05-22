@@ -26,7 +26,7 @@ class VhdlFileHandlerUnittest(unittest.TestCase):
         #'modified' : self.modified, 'mtime' : self.st_mtime,
         #'ctime' : self.compileTime}
         self.test1.parse()
-        actResp = self.test1.getInfo()
+        actResp = self.test1.get_info()
 
         self.assertEqual(actResp['path'], expResp['path'])
         self.assertEqual(actResp['objName'], expResp['objName'])
