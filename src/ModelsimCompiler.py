@@ -188,16 +188,16 @@ class ModelsimCompiler(CogCompilerInterface):
 
 class Bcolors:
     #pylint: disable=invalid-name,unused-variable
-    def __init__(self):
-        self.HEADER = ''
-        self.OKBLUE = ''
-        self.OKGREEN = ''
-        self.WARNING = ''
-        self.FAIL = ''
-        self.ENDC = ''
-        self.BOLD = ''
-        self.UNDERLINE = ''
+    HEADER = ''
+    OKBLUE = ''
+    OKGREEN = ''
+    WARNING = ''
+    FAIL = ''
+    ENDC = ''
+    BOLD = ''
+    UNDERLINE = ''
 
+    def __init__(self):
         if not sys.platform.startswith('win'):
             self.HEADER = '\033[95m'
             self.OKBLUE = '\033[94m'

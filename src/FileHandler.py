@@ -1,5 +1,4 @@
 import os
-import logging
 
 from .CogFileType import CogFileType
 
@@ -9,31 +8,31 @@ class FileHandler(object):
         self.path = path
         self.filename = filename
         self.lib = lib
-        self.filePath = os.path.join(path, filename)
+        self.file_path = os.path.join(path, filename)
 
-        self.objectName = None
-        self.objectType = CogFileType.Undefined
+        self.object_name = None
+        self.object_type = CogFileType.Undefined
         self.library = 'work'
         self.st_mtime = 0
-        self.compileTime = 0
-        self.dependsOnObject = []
+        self.compile_time = 0
+        self.depends_on_object = []
         # Set to false if compile time and modification time has not
         # changed since last run.
         self.modified = True
 
-        self._setChangeTime()
-        self._setCompileTime()
+        self._set_change_time()
+        self._set_compile_time()
 
-    def _setChangeTime(self):
-        stats = os.stat(self.filePath)
+    def _set_change_time(self):
+        stats = os.stat(self.file_path)
         self.st_mtime = stats.st_mtime
 
-    def _setCompileTime(self):
+    def _set_compile_time(self):
         pass
 
-    def getInfo(self):
+    def get_info(self):
         # ctime : compile time
-        return {'path' : self.filePath, 'objName' : self.objectName,
-                'lib' : self.library, 'deps' : self.dependsOnObject,
+        return {'path' : self.file_path, 'objName' : self.object_name,
+                'lib' : self.library, 'deps' : self.depends_on_object,
                 'modified' : self.modified, 'mtime' : self.st_mtime,
-                'ctime' : self.compileTime, 'type' : self.objectType}
+                'ctime' : self.compile_time, 'type' : self.object_type}

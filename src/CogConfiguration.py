@@ -25,7 +25,7 @@ class CogConfiguration(object):
             # Implementation specifics
             try:
                 self._modelsim = config.get('Files', 'MODELSIM')
-            except (NoOptionError, NoSectionError):
+            except (configparser.NoOptionError, configparser.NoSectionError):
                 self._modelsim = None
 
     @property
@@ -48,6 +48,6 @@ class CogConfiguration(object):
     def TB_FILE(self):
         return self._tb_file
 
-    @property 
+    @property
     def MODELSIM(self):
         return self._modelsim
