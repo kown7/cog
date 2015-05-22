@@ -38,6 +38,7 @@ def tests():
 env = Environment()
 
 MODELSIM_GLOBAL = 'E:\\modeltech_pe_10.4a\\win32pe'
+MODELSIM_GLOBAL = 'E:\\questasim64_10.4a\\win64'
 Export('MODELSIM_GLOBAL')
 
 for test in tests():
