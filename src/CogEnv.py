@@ -5,7 +5,7 @@ import sys
 
 from .CogConfiguration import CogConfiguration
 from .Cog import Cog
-from .modelsimCompiler import modelsimCompiler
+from .ModelsimCompiler import ModelsimCompiler
 
 
 class CogEnv(object):
@@ -40,18 +40,18 @@ class CogEnv(object):
 
         # Compiler factory
         if self.cfg.MODELSIM:
-            self.coginst.comp = modelsimCompiler(self.cfg.MODELSIM)
+            self.coginst.comp = ModelsimCompiler(self.cfg.MODELSIM)
 
-        self.coginst.comp.compileOptions = self.cfg.COMPILE_OPTIONS
+        self.coginst.comp.compile_options = self.cfg.COMPILE_OPTIONS
 
         
     def compile_all(self):
         self.coginst.load_cache()
         self.coginst.parse()
         if not self.force_compile:
-            self.coginst.import_compile_times(self.coginst.comp.getLibsContent(self.coginst.libs))
+            self.coginst.import_compile_times(self.coginst.comp.get_libs_content(self.coginst.libs))
         self.coginst.gen_tree()
-        self.coginst.comp.compileAllFiles(self.coginst.col)
+        self.coginst.comp.compile_all_files(self.coginst.col)
         self.coginst.save_cache()
 
         
@@ -59,14 +59,14 @@ class CogEnv(object):
         self.coginst.load_cache()
         self.coginst.parse()
         if not self.force_compile:
-            self.coginst.import_compile_times(self.coginst.comp.getLibsContent(self.coginst.libs))
+            self.coginst.import_compile_times(self.coginst.comp.get_libs_content(self.coginst.libs))
         self.coginst.gen_tree(self.coginst.top_file)
-        self.coginst.comp.compileAllFiles(self.coginst.col)
+        self.coginst.comp.compile_all_files(self.coginst.col)
         self.coginst.save_cache()
 
         
     def run_simulation_gui(self):
-        return self.coginst.comp.runSimulationGui(self.cfg.TB_ENTITY, self.cfg.SIM_OPTIONS)
+        return self.coginst.comp.run_simulation_gui(self.cfg.TB_ENTITY, self.cfg.SIM_OPTIONS)
 
     def run_simulation(self):
-        return self.coginst.comp.runSimulation(self.cfg.TB_ENTITY, self.cfg.SIM_OPTIONS)
+        return self.coginst.comp.run_simulation(self.cfg.TB_ENTITY, self.cfg.SIM_OPTIONS)
