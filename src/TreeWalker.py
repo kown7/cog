@@ -20,7 +20,8 @@ import logging
 
 from .VhdlFileHandler import VhdlFileHandler
 from .SvFileHandler import SvFileHandler
-from .functions import *
+from .functions import str_fname_inode
+
 
 class TreeWalker(object):
     def __init__(self, basedir, lib, path, exclude, cached):
@@ -62,7 +63,7 @@ class TreeWalker(object):
                     logging.debug('VHDL file parsing: ' + i)
                     vhdl_inst = VhdlFileHandler(self.cpath, i, self.lib)
                     vhdl_inst.parse()
-                    self.centries.update({str_fname_inode(cur_path) : vhdl_inst.getInfo()})
+                    self.centries.update({str_fname_inode(cur_path) : vhdl_inst.get_info()})
             elif i.lower().endswith(('.sv')):
                 try:
                     if (self.cached[inode_idx]['path'] == cur_path and
@@ -75,7 +76,7 @@ class TreeWalker(object):
                     logging.debug('SystemVerilog file parsing: ' + i)
                     svinst = SvFileHandler(self.cpath, i, self.lib)
                     svinst.parse()
-                    self.centries.update({str_fname_inode(cur_path) : svinst.getInfo()})
+                    self.centries.update({str_fname_inode(cur_path) : svinst.get_info()})
 
 
     def parse(self):

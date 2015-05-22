@@ -1,40 +1,41 @@
 import re
+import logging
 
-from .FileHandler import *
+from .FileHandler import FileHandler
+from .CogFileType import CogFileType
 
 class SvFileHandler(FileHandler):
     def parse(self):
-        cntParentheses = 0
+        cnt_parentheses = 0
 
-        SvIdentifier = '[a-zA-Z][a-zA-Z0-9_]*'
+        sv_identifier = '[a-zA-Z][a-zA-Z0-9_]*'
 
-        LineNum = 0
-        with open(self.filePath, 'r') as f:
-            for LineIn in f:
-                LineNum += 1
+        line_num = 0
+        with open(self.file_path, 'r') as filep:
+            for line_in in filep:
+                line_num += 1
                 # Remove comments
-                Line = LineIn.split('//',1)[0]
-    
-                # Search for entities instanciated 
+                line = line_in.split('//', 1)[0]
+
+                # Search for entities instanciated
                 # Currently no modules et c. are extracted from SV
-                m = re.search('('+SvIdentifier+')\s+i_('+SvIdentifier+')\s*\(', Line)
-                if m != None:
-                    logging.debug(self.library + ':DEP: ' + m.group(1))
-                    self.dependsOnObject.append([self.library, m.group(1).lower()])
-                
-                if self.objectName == None:
+                mtx = re.search(r'('+sv_identifier+r')\s+i_('+sv_identifier+r')\s*\(', line)
+                if mtx != None:
+                    logging.debug(self.library + ':DEP: ' + mtx.group(1))
+                    self.depends_on_object.append([self.library, mtx.group(1).lower()])
+
+                if self.object_name == None:
                     # The top-level module does not implement
                     # interfaces and the like, hence the ';'. Should
                     # be parameterized.
-                    m = re.search('module\s+('+SvIdentifier+')\s*;', Line.lower())
-                    if m != None:
-                        self.objectName = m.group(1)
-                        logging.debug('Module:'+ str(LineNum) +': ' + m.group(1))
-                        self.objectType = CogFileType.SvModule
+                    mtx = re.search(r'module\s+('+sv_identifier+r')\s*;', line.lower())
+                    if mtx != None:
+                        self.object_name = mtx.group(1)
+                        logging.debug('Module:'+ str(line_num) +': ' + mtx.group(1))
+                        self.object_type = CogFileType.SvModule
                 else:
-                    cntParentheses += Line.count('(') - Line.count(')')
-    
-    
-            if self.objectName == None:
-                logging.warning('No object found in ' + str(self.filePath))
-        
+                    cnt_parentheses += line.count('(') - line.count(')')
+
+
+            if self.object_name == None:
+                logging.warning('No object found in ' + str(self.file_path))
