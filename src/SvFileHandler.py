@@ -19,7 +19,7 @@ class SvFileHandler(FileHandler):
 
                 # Search for entities instanciated
                 # Currently no modules et c. are extracted from SV
-                mtx = re.search(r'('+sv_identifier+r')\s+i_('+sv_identifier+r')\s*\(', line)
+                mtx = re.search(r'^\s*('+sv_identifier+r')\s+i_('+sv_identifier+r')\s*\(', line)
                 if mtx != None:
                     logging.debug(self.library + ':DEP: ' + mtx.group(1))
                     self.depends_on_object.append([self.library, mtx.group(1).lower()])
