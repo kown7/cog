@@ -103,7 +103,9 @@ program test_test1;
       #100;
    end // initial begin
 
-
+   // automatic keyword is essential, as it otherwise uses the same
+   // veriables/memory-locations for subsequent task-calls, which are
+   // paralled by the fork-keyword.
    task automatic assertABio(input int a, b);
       int al, bl;
       begin
