@@ -37,11 +37,30 @@
 <p>This project aims to facilitate your design/simulation process by
 not having to care about compile orders anymore. Simply configure your
 libraries and optionally your top design file and cog.py will generate
-an list in which order the design elements are to be compiled.</p>
+a list in which order the design elements are to be compiled.</p>
 
 <p>For a simple demonstration download the files from the link above
-in either tar.gz or zip format and run the <code>src/simple.py</code>
-script.</p>
+in either tar.gz or zip format go to <code>tb/test1</code> under
+windows or <code>tb/testCW</code> under cygwin. Run the appropriate
+bat or shell script to setup a sim folder.</p>
+
+<p>Sample hook-scripts have been written to accomodate
+the <a href="http://www.scons.org">SCons</a> build tool. To compile
+all testbenches in <code>tb</code> with SCons into
+the <code>tb/build</code> folder, just enter the following, given one
+is in the repo's root directory.
+<pre><code>$ cd tb
+$ scons
+</code></pre>
+To run a specific testbench, the following will do.
+<pre><code>$ cd tb
+$ scons build/test2/run
+</code></pre>
+
+One's reminded that the Modelsim-path must be chosen appropriately in the
+<code>tb/SConstruct</code> file.
+
+</p>
 
 <!--
 <pre><code>$ cd your_repo_root/repo_name
@@ -53,7 +72,10 @@ $ git checkout gh-pages
 <a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span class="octicon octicon-link"></span></a>Future features</h3>
 
 <p>Currently, only VHDL is supported, but it is my strong intent to
-support Verilog flavours in the soon future as well.</p>
+support Verilog flavours in the soon future as well. SystemVerilog
+testbenches can be used given some style-guidelines are followed,
+i.e., the DUT's name is matched by the following regular expression
+<code>i_[A-Za-z_]+</code>.</p>
 
       </section>
     </div>
