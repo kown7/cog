@@ -125,8 +125,12 @@ class ModelsimCompiler(CogCompilerInterface):
             parms = [compiler]+self.compile_options+['-work', filep[0], dec_fname]
             i = call(parms, env=lenv)
             if i != 0:
-                input(Bcolors.WARNING+'Enter to terminate'+Bcolors.ENDC)
-                raise SystemExit
+                try:
+                    input(Bcolors.WARNING+'Enter to terminate'+Bcolors.ENDC)
+                except (SyntaxError, NameError):
+                    raise SystemExit
+                else:
+                    raise SystemExit
 
 
     def run_simulation(self, dut_name, sim_options=None):
